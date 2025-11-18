@@ -1,30 +1,36 @@
-import tls_client
-import requests
-from bs4 import BeautifulSoup
 import hashlib
+import os
 import re
 import time
-import os
+import requests
+import tls_client
+from bs4 import BeautifulSoup
+import json
 
 API_KEY = os.getenv("NEWSAPI_KEY")
 NEWSDATA_KEY = os.getenv("NEWSDATA_KEY")
 
-
-#cloudfare
+# Cloudflare-friendly session
 session = tls_client.Session(
     client_identifier="chrome_120",
-    random_tls_extension_order=True
+    random_tls_extension_order=True,
 )
 
-DEBUG = True  
+DEFAULT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Accept-Language": "en-US,en;q=0.9",
+}
 
+DEBUG = False
 
 
 def clean(t):
     return re.sub(r"\s+", " ", t or "").strip()
 
+
 def hash_url(url):
     return hashlib.md5(url.encode()).hexdigest()
+
 
 def debug_log(source, kw, status, text):
     """debug printing."""
@@ -36,7 +42,6 @@ def debug_log(source, kw, status, text):
     print("----- END HTML SNIPPET -----\n")
 
 
-
 NBIM_KEYWORDS = [
     "NBIM",
     "Norges Bank Investment Management",
@@ -46,9 +51,22 @@ NBIM_KEYWORDS = [
     "\"NBIM regulation\"",
 ]
 
+
+def safe_get(url, *, params=None, parser_source="", kw=""):
+    """Session GET with headers & debug + exception handling."""
+    try:
+        resp = session.get(url, params=params or {}, headers=DEFAULT_HEADERS)
+    except Exception as exc:
+        debug_log(parser_source, kw, "EXC", str(exc))
+        return None
+
+    debug_log(parser_source, kw, resp.status_code, resp.text)
+    return resp
+
+
 def fetch_newsapi(kw, pages=2):
     results = []
-    for p in range(1, pages+1):
+    for p in range(1, pages + 1):
         r = requests.get(
             "https://newsapi.org/v2/everything",
             params={
@@ -57,185 +75,286 @@ def fetch_newsapi(kw, pages=2):
                 "language": "en",
                 "pageSize": 50,
                 "page": p,
-                "sortBy": "publishedAt"
-            }
+                "sortBy": "publishedAt",
+            },
+            timeout=20,
         )
 
         debug_log("NewsAPI", kw, r.status_code, str(r.text))
 
+        if r.status_code == 429:
+            # hit rate limit; stop trying more pages/keywords for now
+            break
         if r.status_code != 200:
             continue
 
         results.extend(r.json().get("articles", []))
         time.sleep(0.2)
 
-    return [{
-        "source": "NewsAPI",
-        "title": clean(a.get("title")),
-        "url": a.get("url")
-    } for a in results if a.get("url")]
+    return [
+        {
+            "source": "NewsAPI",
+            "title": clean(a.get("title")),
+            "url": a.get("url"),
+            "published": a.get("publishedAt"),
+            "content": a.get("content") or a.get("description"),
+        }
+        for a in results
+        if a.get("url")
+    ]
+
 
 def fetch_nbim_press():
     url = "https://www.nbim.no/en/news-and-insights/the-press/press-releases/"
-    r = session.get(url)
+    r = safe_get(url, parser_source="NBIM Press", kw="STATIC")
 
-    debug_log("NBIM Press", "STATIC", r.status_code, r.text)
-
-    if r.status_code != 200:
+    if not r or r.status_code != 200:
         return []
 
     soup = BeautifulSoup(r.text, "html.parser")
     posts = soup.select("a.article-list_item")
 
-    return [{
-        "source": "NBIM",
-        "title": clean(p.get_text()),
-        "url": "https://www.nbim.no" + p.get("href")
-    } for p in posts]
+    return [
+        {
+            "source": "NBIM",
+            "title": clean(p.get_text()),
+            "url": "https://www.nbim.no" + p.get("href"),
+            "published": None,
+            "content": None,
+        }
+        for p in posts
+    ]
+
+
+def fetch_wordpress_search(base_url, selector, source, kw, pages=3):
+    """Handles paginated WP search pages to pull more results."""
+    results = []
+    for page in range(1, pages + 1):
+        url = f"{base_url}?s={kw}&paged={page}"
+        r = safe_get(url, parser_source=source, kw=kw)
+        if not r or r.status_code != 200:
+            break
+
+        soup = BeautifulSoup(r.text, "html.parser")
+        posts = soup.select(selector)
+        if not posts:
+            break
+
+        results.extend(
+            [
+                {
+                    "source": source,
+                    "title": clean(p.get_text()),
+                    "url": p.get("href"),
+                    "published": None,
+                    "content": None,
+                }
+                for p in posts
+            ]
+        )
+
+        time.sleep(0.2)
+
+    return results
 
 
 def fetch_responsible_investor(kw):
-    url = f"https://www.responsible-investor.com/?s={kw}"
-    r = session.get(url)
-
-    debug_log("ResponsibleInvestor", kw, r.status_code, r.text)
-
-    if r.status_code != 200:
-        return []
-
-    soup = BeautifulSoup(r.text, "html.parser")
-    posts = soup.select("h3.entry-title a")
-
-    return [{
-        "source": "ResponsibleInvestor",
-        "title": clean(p.get_text()),
-        "url": p.get("href")
-    } for p in posts]
+    return fetch_wordpress_search(
+        "https://www.responsible-investor.com/",
+        "h3.entry-title a",
+        "ResponsibleInvestor",
+        kw,
+        pages=4,
+    )
 
 
 def fetch_ai_cio(kw):
-    url = f"https://www.ai-cio.com/?s={kw}"
-    r = session.get(url)
+    return fetch_wordpress_search(
+        "https://www.ai-cio.com/",
+        "h3.entry-title a",
+        "AI-CIO",
+        kw,
+        pages=4,
+    )
 
-    debug_log("AI-CIO", kw, r.status_code, r.text)
 
-    if r.status_code != 200:
-        return []
+def fetch_newsdata(kw, pages=3):
+    results = []
+    next_page = None
+    for _ in range(pages):
+        params = {
+            "apikey": NEWSDATA_KEY,
+            "q": kw,
+            "language": "en",
+        }
+        if next_page:
+            params["page"] = next_page
 
-    soup = BeautifulSoup(r.text, "html.parser")
-    posts = soup.select("h3.entry-title a")
+        r = requests.get("https://newsdata.io/api/1/news", params=params, timeout=20)
+        debug_log("NewsData", kw, r.status_code, str(r.text))
+        if r.status_code != 200:
+            break
 
-    return [{
-        "source": "AI-CIO",
-        "title": clean(p.get_text()),
-        "url": p.get("href")
-    } for p in posts]
+        payload = r.json()
+        data = payload.get("results", [])
+        results.extend(data)
 
-def fetch_top1000(kw):
-    url = f"https://www.top1000funds.com/?s={kw}"
-    r = session.get(url)
+        next_page = payload.get("nextPage")
+        if not next_page:
+            break
 
-    debug_log("Top1000Funds", kw, r.status_code, r.text)
+        time.sleep(0.2)
 
-    if r.status_code != 200:
-        return []
+    return [
+        {
+            "source": "NewsData",
+            "title": clean(a.get("title")),
+            "url": a.get("link"),
+            "published": a.get("pubDate"),
+            "content": a.get("description"),
+        }
+        for a in results
+        if a.get("link")
+    ]
 
-    soup = BeautifulSoup(r.text, "html.parser")
-    posts = soup.select("h3.entry-title a")
-
-    return [{
-        "source": "Top1000Funds",
-        "title": clean(p.get_text()),
-        "url": p.get("href")
-    } for p in posts]
-
-def fetch_newsdata(kw):
-    url = f"https://newsdata.io/api/1/news?apikey={NEWSDATA_KEY}&q={kw}"
-    r = requests.get(url)
-
-    debug_log("NewsData", kw, r.status_code, str(r.text))
-
-    if r.status_code != 200:
-        return []
-
-    data = r.json().get("results", [])
-
-    return [{
-        "source": "NewsData",
-        "title": clean(a.get("title")),
-        "url": a.get("link")
-    } for a in data if a.get("link")]
 
 def fetch_google_news(kw):
-    url = f"https://news.google.com/rss/search?q={kw}"
-    r = session.get(url)
+    params = {
+        "q": kw,
+        "hl": "en-US",
+        "gl": "US",
+        "ceid": "US:en",
+    }
+    url = "https://news.google.com/rss/search"
+    r = safe_get(url, parser_source="GoogleNews", kw=kw, params=params)
 
-    debug_log("GoogleNews", kw, r.status_code, r.text)
-
-    if r.status_code != 200:
+    if not r or r.status_code != 200:
         return []
 
     soup = BeautifulSoup(r.text, "xml")
     items = soup.find_all("item")
 
-    return [{
-        "source": "GoogleNews",
-        "title": clean(i.title.text),
-        "url": clean(i.link.text)
-    } for i in items]
+    return [
+        {
+            "source": "GoogleNews",
+            "title": clean(i.title.text),
+            "url": clean(i.link.text),
+            "published": clean(i.pubDate.text) if i.pubDate else None,
+            "content": clean(i.description.text) if i.description else None,
+        }
+        for i in items
+    ]
+
 
 def fetch_ddg(kw):
     url = f"https://duckduckgo.com/html/?q={kw}"
-    r = session.get(url)
+    r = safe_get(url, parser_source="DuckDuckGo", kw=kw)
 
-    debug_log("DuckDuckGo", kw, r.status_code, r.text)
-
-    if r.status_code != 200:
+    if not r or r.status_code != 200:
         return []
 
     soup = BeautifulSoup(r.text, "html.parser")
     links = soup.select("a.result__a")
 
-    return [{
-        "source": "DuckDuckGo",
-        "title": clean(a.get_text()),
-        "url": a.get("href")
-    } for a in links]
+    return [
+        {
+            "source": "DuckDuckGo",
+            "title": clean(a.get_text()),
+            "url": a.get("href"),
+            "published": None,
+            "content": None,
+        }
+        for a in links
+    ]
+
+
+def extract_article_body(html_text):
+    soup = BeautifulSoup(html_text, "html.parser")
+    for tag in soup(["script", "style", "noscript"]):
+        tag.decompose()
+    text = " ".join(chunk.strip() for chunk in soup.stripped_strings)
+    return clean(text)[:5000]  # trim to avoid huge payloads
+
+
+def fetch_article_content(url):
+    r = safe_get(url, parser_source="ArticleFetch", kw=url)
+    if not r or r.status_code != 200:
+        return None, None
+
+    body = extract_article_body(r.text)
+
+    soup = BeautifulSoup(r.text, "html.parser")
+    # time tags with datetime
+    time_tag = soup.find("time")
+    if time_tag and time_tag.get("datetime"):
+        pub = clean(time_tag.get("datetime"))
+    elif time_tag and time_tag.get_text():
+        pub = clean(time_tag.get_text())
+    else:
+        pub = None
+
+    return body, pub
+
 
 def fetch_all():
     items = []
 
-    # NewsAPI
     for kw in NBIM_KEYWORDS:
         items += fetch_newsapi(kw)
 
-    # NBIM press
     items += fetch_nbim_press()
 
-    # Institutional
     for kw in NBIM_KEYWORDS:
         items += fetch_responsible_investor(kw)
         items += fetch_ai_cio(kw)
-        items += fetch_top1000(kw)
 
-    # Global sources
     for kw in NBIM_KEYWORDS:
         items += fetch_newsdata(kw)
         items += fetch_google_news(kw)
         items += fetch_ddg(kw)
 
-    # Deduplicate
     uniq = {}
     for a in items:
         if a.get("url"):
             uniq[hash_url(a["url"])] = a
 
-    return list(uniq.values())
+    enriched = []
+    for a in uniq.values():
+        body, pub = fetch_article_content(a["url"])
+        if body:
+            a["content"] = body
+        if pub and not a.get("published"):
+            a["published"] = pub
+        enriched.append(a)
 
-articles = fetch_all()
+    return enriched
 
 
-for i, a in enumerate(articles):
-    print(f"{i+1}. [{a['source']}] {a['title']}")
-    print(a["url"])
-    print()
+def write_output_json(articles, path="output_scrape.json"):
+    records = []
+    for a in articles:
+        record = {
+            "title": a.get("title") or "",
+            "date": a.get("published") or "",
+            "source": a.get("source") or "",
+            "tags": ["sovereign wealth", "NBIM"],
+            "content": a.get("content") or "",
+            "url": a.get("url") or "",
+        }
+        records.append(record)
+
+    with open(path, "w") as f:
+        json.dump(records, f, indent=2)
+
+    return records
+
+
+if __name__ == "__main__":
+    articles = fetch_all()
+
+    write_output_json(articles)
+
+    for i, a in enumerate(articles):
+        print(f"{i+1}. [{a['source']}] {a['title']}")
+        print(a["url"])
+        print()
