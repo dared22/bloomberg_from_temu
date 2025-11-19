@@ -1,12 +1,11 @@
 import json
 import asyncio
-import aiohttp
 from openai import AsyncOpenAI
 import backoff
-from email.utils import parsedate_to_datetime
 import datetime
 
-client = AsyncOpenAI() 
+client = AsyncOpenAI()
+
 
 SYSTEM_PROMPT = """
 You are a regulatory news filter for Norges Bank Investment Management (NBIM).
@@ -14,6 +13,7 @@ You are a regulatory news filter for Norges Bank Investment Management (NBIM).
 Task:
 Given a list of news articles (title, snippet, date, source, url), decide:
 1) Is this REGULATORY / POLICY relevant for NBIM's investments?
+
 Return ONLY events that clearly qualify as:
     - financial regulation
     - securities/market regulation
@@ -30,35 +30,22 @@ Exclude:
     - generic business news
     - press releases without regulatory consequence
     - opinion pieces
-    - irrelevant financial reports
+    - irrelevant financial or corporate earnings
     - articles lacking policy/regulation angle
     
-If NOT clearly regulatory or policy-related: mark keep=false.
+If NOT clearly regulatory: mark keep=false.
 
 If YES:
 - classify region as one of:
   "North America", "Europe", "Asia", "Oceania", "Latin America".
-- write a 2–4 sentence summary.
-- explain briefly why this matters from a regulatory/investment risk perspective.
-- infer a more specific source name from title/snippet.
-- set relevant policy/ESG/market/regulation tags.
+- write a 2–4 sentence factual summary.
+- explain why this matters from a regulatory/investment risk perspective.
+- infer correct source (e.g., Reuters, Bloomberg, AP, FT, Gov press release).
+- set meaningful tags.
 - classify nbimSentiment: bullish / neutral / bearish.
 
-Be concise, factual, non-speculative.
+Always include ALL required fields, even if keep=false.
 """
-
-def build_articles_payload(batch):
-    return [
-        {
-            "id": art["id"],
-            "title": art["title"],
-            "date": art.get("date") or "",
-            "source": art.get("source") or "",
-            "url": art["url"],
-            "snippet": art.get("snippet") or ""
-        }
-        for art in batch
-    ]
 
 JSON_SCHEMA = {
     "name": "RegulatoryClassification",
@@ -83,55 +70,63 @@ JSON_SCHEMA = {
                                 "Europe",
                                 "Asia",
                                 "Oceania",
-                                "Latin America"
-                            ]
+                                "Latin America",
+                                "Global"
+                            ],
                         },
                         "source": {"type": "string"},
                         "tags": {
                             "type": "array",
-                            "items": {"type": "string"}
+                            "items": {"type": "string"},
                         },
                         "url": {"type": "string"},
                         "nbimSentiment": {
                             "type": "string",
-                            "enum": ["bullish", "neutral", "bearish"]
-                        }
+                            "enum": ["bullish", "neutral", "bearish"],
+                        },
                     },
                     "required": [
-                        "id", "keep", "title", "region",
-                        "summary", "date", "whyItMatters",
-                        "source", "tags", "url", "nbimSentiment"
-                    ]
-                }
+                        "id", "keep", "title", "region", "summary", "date",
+                        "whyItMatters", "source", "tags", "url", "nbimSentiment",
+                    ],
+                },
             }
         },
-        "required": ["articles"]
-    }
+        "required": ["articles"],
+    },
 }
+
+
+
+def build_articles_payload(batch):
+    return [
+        {
+            "id": art["id"],
+            "title": art["title"],
+            "date": art.get("date") or "",
+            "source": art.get("source") or "",
+            "url": art["url"],
+            "snippet": art.get("snippet") or "",
+            "regionGuess": art.get("regionGuess") or ""
+        }
+        for art in batch
+    ]
+
 
 
 @backoff.on_exception(backoff.expo, Exception, max_tries=5)
 async def classify_batch_async(batch):
     payload = build_articles_payload(batch)
-
     response = await client.chat.completions.create(
-        model="gpt-4.1-mini",
-        response_format={
-            "type": "json_schema",
-            "json_schema": JSON_SCHEMA
-        },
+        model="gpt-5-mini",
+        response_format={"type": "json_schema", "json_schema": JSON_SCHEMA},
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": (
-                    "Classify the following articles:\n\n" +
-                    json.dumps({"articles": payload}, ensure_ascii=False)
-                ),
-            },
+            {"role": "user",
+             "content": "Classify the following articles:\n\n" +
+                        json.dumps({"articles": payload}, ensure_ascii=False)}
         ],
     )
-
     return json.loads(response.choices[0].message.content)
 
 
@@ -139,59 +134,76 @@ def chunk(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i+n]
 
-def parse_date_safe(d):
-    if not d:
-        return None
-    try:
-        return parsedate_to_datetime(d)
-    except Exception:
-        return None
-
 
 async def main():
-    with open("output_google_nbim.json", "r") as file:
-        loaded = json.load(file)
 
-    # Parse dates 
+    # Load scraped articles
+    with open("regulatory_articles.json", "r") as f:
+        loaded = json.load(f)
+
+    # Ensure regionGuess exists
     for art in loaded:
-        art["_parsed_date"] = parse_date_safe(art.get("date"))
+        art.setdefault("regionGuess", None)
 
-    loaded_sorted = sorted(
-        loaded,
-        key=lambda x: x["_parsed_date"] or datetime.min,
-        reverse=True
-    )
+    # Group by regionGuess
+    region_groups = {
+        "North America": [],
+        "Europe": [],
+        "Asia": [],
+        "Oceania": [],
+        "Latin America": []
+    }
 
-    #100 newest
-    all_articles = loaded_sorted[:100]
-    BATCH_SIZE = 25      
-    MAX_PARALLEL = 6     #concurrency
+    for art in loaded:
+        guess = art.get("regionGuess")
+        if guess in region_groups:
+            region_groups[guess].append(art)
 
-    tasks = []
+    #top 25 for each region
+    selected_articles = []
+
+    for region, arts in region_groups.items():
+        arts_sorted = sorted(
+            arts, key=lambda x: x["date"] or datetime.datetime.min, reverse=True
+        )
+
+        top_25 = arts_sorted[:25]
+        selected_articles.extend(top_25)
+
+    for idx, art in enumerate(selected_articles):
+        art["id"] = idx
+        if "_parsed_date" in art:
+            del art["_parsed_date"]
+
+    #feed chat with batches
+    BATCH_SIZE = 25
+    MAX_PARALLEL = 6
 
     sem = asyncio.Semaphore(MAX_PARALLEL)
+    tasks = []
 
     async def sem_task(batch):
         async with sem:
             return await classify_batch_async(batch)
 
-    for batch in chunk(all_articles, BATCH_SIZE):
+    for batch in chunk(selected_articles, BATCH_SIZE):
         tasks.append(asyncio.create_task(sem_task(batch)))
 
-    # concurrent results
     raw_results = await asyncio.gather(*tasks)
 
+    # Flatten
     results = []
     for r in raw_results:
         results.extend(r["articles"])
 
+    # Final aggregation
     final = {
         "North America": [],
         "Europe": [],
         "Asia": [],
         "Oceania": [],
         "Latin America": [],
-        "Global": []
+        "Global" : []
     }
 
     for art in results:
@@ -200,15 +212,15 @@ async def main():
         if not art.get("keep"):
             continue
 
-        region = art.get("region")
+        required = ["title", "summary", "date", "whyItMatters",
+                    "source", "tags", "url", "nbimSentiment", "region"]
+        if not all(k in art for k in required):
+            continue
+
+        region = art["region"]  
 
         if region not in final:
             region = "Global"
-
-        # double check gpt
-        required = ["title", "summary", "date", "whyItMatters", "source", "tags", "url", "nbimSentiment"]
-        if not all(k in art for k in required):
-            continue
 
         final[region].append({
             "title": art["title"],
@@ -222,10 +234,10 @@ async def main():
             "nbimSentiment": art["nbimSentiment"],
         })
 
-
-    with open("nbim_regulatory_news_by_region.json", "w") as f:
+    with open("regulatory_news.json", "w") as f:
         json.dump(final, f, indent=2)
 
-    print("DONE — wrote nbim_regulatory_news_by_region.json")
+    print("New regulatory_news.json generated")
+
 
 asyncio.run(main())

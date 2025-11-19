@@ -1,20 +1,13 @@
 import hashlib
-import os
 import re
 import time
+import json
 import tls_client
 from bs4 import BeautifulSoup
-import json
+from email.utils import parsedate_to_datetime
 
-FETCH_FULL_ARTICLE = False
 
-NBIM_KEYWORDS = [
-    "NBIM",
-    "Norges Bank Investment Management",
-    "Government Pension Fund Global",
-    "Norway sovereign wealth fund",
-    "GPFG",
-]
+MAX_SNIPPET_LEN = 800
 
 session = tls_client.Session(
     client_identifier="chrome_120",
@@ -22,12 +15,42 @@ session = tls_client.Session(
 )
 
 DEFAULT_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+    "User-Agent": "Mozilla/5.0",
     "Accept-Language": "en-US,en;q=0.9",
 }
 
+REGULATORY_KEYWORDS = {
+    "North America": [
+        "US financial regulation",
+        "US sanctions policy",
+    ],
+    "Europe": [
+        "EU regulation",
+        "EU sanctions policy",
+    ],
+    "Asia": [
+        "Asia financial regulation",
+        "Asia central bank policy",
+    ],
+    "Oceania": [
+        "Australia financial regulation",
+        "New Zealand financial regulation",
+    ],
+    "Latin America": [
+        "Latin America financial regulation",
+        "Brazil financial regulation",
+    ],
+}
+
+
 def clean(t):
     return re.sub(r"\s+", " ", t or "").strip()
+
+def clean_html(html):
+    if not html:
+        return ""
+    soup = BeautifulSoup(html, "html.parser")
+    return soup.get_text(" ", strip=True)
 
 def hash_url(url):
     return hashlib.md5(url.encode()).hexdigest()
@@ -38,13 +61,18 @@ def safe_get(url, *, params=None):
     except Exception:
         return None
 
+def extract_article_body(html_text):
+    """HTML->text"""
+    soup = BeautifulSoup(html_text, "html.parser")
+    for tag in soup(["script", "style", "noscript"]):
+        tag.decompose()
+    text = " ".join(chunk.strip() for chunk in soup.stripped_strings)
+    return clean(text)
+
+
 def fetch_google_news(kw):
-    params = {
-        "q": kw,
-        "hl": "en-US",
-        "gl": "US",
-        "ceid": "US:en",
-    }
+    """Fetch from Google News RSS search."""
+    params = {"q": kw, "hl": "en-US", "gl": "US", "ceid": "US:en"}
     url = "https://news.google.com/rss/search"
 
     r = safe_get(url, params=params)
@@ -59,88 +87,84 @@ def fetch_google_news(kw):
             "source": "GoogleNews",
             "title": clean(i.title.text),
             "url": clean(i.link.text),
-            "published": clean(i.pubDate.text) if i.pubDate else None,
-            "content": clean(i.description.text) if i.description else None,
+            "published": clean(i.pubDate.text) if i.pubDate else "",
+            "content": clean(i.description.text) if i.description else "",
         }
         for i in items
     ]
 
 
-def extract_article_body(html_text):
-    soup = BeautifulSoup(html_text, "html.parser")
-    for tag in soup(["script", "style", "noscript"]):
-        tag.decompose()
-    text = " ".join(chunk.strip() for chunk in soup.stripped_strings)
-    return clean(text)[:5000]  
 
-def fetch_article_content(url):
-    r = safe_get(url)
-    if not r or r.status_code != 200:
+def parse_date_safe(d):
+    try:
+        return parsedate_to_datetime(d)
+    except Exception:
         return None
-    return extract_article_body(r.text)
+    
+def format_date_iso(d):
+    dt = parse_date_safe(d)
+    if not dt:
+        return ""
+    return dt.strftime("%Y-%m-%d")
 
 
-def fetch_all_google():
-    items = []
+def fetch_all():
+    collected = []
 
-    for kw in NBIM_KEYWORDS:
-        items.extend(fetch_google_news(kw))
-        time.sleep(0.2)
+    for region, keywords in REGULATORY_KEYWORDS.items():
+        for kw in keywords:
+            articles = fetch_google_news(kw)
+            for a in articles:
+                a["regionGuess"] = region
+            collected.extend(articles)
+            time.sleep(0.15)  #rate control
 
     uniq = {}
-    for a in items:
+    for a in collected:
         if a.get("url"):
             uniq[hash_url(a["url"])] = a
 
-    articles = list(uniq.values())
+    enriched = []
+    for a in uniq.values():
 
-    if FETCH_FULL_ARTICLE:
-        for a in articles:
-            body = fetch_article_content(a["url"])
-            if body:
-                a["content"] = body
-            time.sleep(0.2)
+        snippet_html = a.get("content", "")
+        snippet = clean(clean_html(snippet_html))[:MAX_SNIPPET_LEN]
+        snippet = snippet[:MAX_SNIPPET_LEN]
 
-    return articles
-
-
-def write_output_json(articles, path="output_google_nbim.json"):
-    """
-    schema:
-
-    {
-        "id": int,
-        "title": str,
-        "date": str,
-        "source": str,
-        "url": str,
-        "snippet": str
-    }
-    """
-
-    formatted = []
-
-    for idx, a in enumerate(articles):
-        formatted.append({
-            "id": idx,
+        enriched.append({
             "title": a.get("title", ""),
-            "date": a.get("published", ""),
-            "source": a.get("source", ""),
+            "date": format_date_iso(a.get("published", "")),
+            "source": a.get("source", "GoogleNews"),
             "url": a.get("url", ""),
-            "snippet": a.get("content", "")[:800] if a.get("content") else ""
+            "snippet": snippet,
+            "regionGuess": a.get("regionGuess", None)
         })
 
-    with open(path, "w") as f:
-        json.dump(formatted, f, indent=2)
+    return enriched
 
-    return formatted
+
+
+def write_output_json(articles):
+    articles_sorted = sorted(
+        articles,
+        key=lambda x: x.get("date", ""),
+        reverse=True
+    )
+
+    final = []
+    for idx, art in enumerate(articles_sorted):
+        art["id"] = idx
+        final.append(art)
+
+    with open("regulatory_articles.json", "w") as f:
+        json.dump(final, f, indent=2)
+
+    return final
+
+
 
 
 if __name__ == "__main__":
-    articles = fetch_all_google()
-    write_output_json(articles)
-
-    for i, a in enumerate(articles):
-        print(f"{i+1}. [{a['source']}] {a['title']}")
-        print(a["url"])
-        print()
+    arts = fetch_all()
+    final = write_output_json(arts)
+    print(f"Saved {len(final)} regulatory articles.")

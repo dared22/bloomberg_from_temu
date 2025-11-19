@@ -39,10 +39,9 @@ st.markdown(
 )
 
 
-with open("output.json") as f:
+with open("regulatory_news.json") as f:
     articles_by_region = json.load(f)
 
-# Flatten articles into one list with region
 flat_articles = []
 for region, items in articles_by_region.items():
     for art in items:
