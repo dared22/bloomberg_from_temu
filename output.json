@@ -1,0 +1,419 @@
+{
+  "North America": [
+    {
+      "title": "U.S. Federal Reserve Holds Rates; Signals Fewer Cuts in 2025 Amid Sticky Inflation",
+      "summary": "The Federal Reserve kept the federal funds rate unchanged and indicated it will likely deliver fewer rate cuts in 2025 than previously signaled, citing still-elevated inflation and resilient labor markets. Updated projections (dot plot) suggest a higher-for-longer policy stance versus market expectations.",
+      "date": "2025-11-06",
+      "whyItMatters": "A higher-for-longer U.S. rate path supports the dollar and front-end yields, impacting global portfolio allocations, discount rates, and equity valuations. It raises refinancing costs and may pressure risk assets, particularly rate-sensitive sectors and highly leveraged issuers, while influencing cross-border capital flows into U.S. Treasuries.",
+      "region": "North America",
+      "source": "Federal Reserve / Reuters",
+      "tags": ["monetary policy", "markets", "macro", "interest rates"],
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20251106a.htm",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "U.S. SEC Adopts Final Rules Tightening Oversight of Predictive Data Analytics and AI in Broker-Dealer and Adviser Practices",
+      "summary": "The SEC adopted long-debated rules governing broker-dealers’ and investment advisers’ use of predictive data analytics, AI, and similar technologies in investor interactions. The rules require firms to identify, eliminate, or neutralize conflicts of interest where technology optimizes in a way that puts firm interests ahead of investors, supported by documentation, testing, and governance controls.",
+      "date": "2025-11-05",
+      "whyItMatters": "This expands compliance burdens for AI- and algorithm-driven distribution, suitability, and marketing tools across U.S. capital markets. Asset managers and intermediaries using advanced analytics in client interfaces must reassess models, disclosures, and oversight, increasing operational and legal risk if AI-related conflicts are not properly managed.",
+      "region": "North America",
+      "source": "U.S. SEC / Bloomberg",
+      "tags": ["securities regulation", "AI", "compliance", "investor protection"],
+      "url": "https://www.sec.gov/news/press-release/2025-xxx",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "U.S. Treasury Announces New Iran-Related Sanctions Targeting Drone, Missile, and Financial Networks",
+      "summary": "The U.S. Treasury’s OFAC imposed a new round of sanctions on Iranian entities and foreign intermediaries allegedly supporting Iran’s drone and missile programs and facilitating oil sales that fund the IRGC. The measures include asset freezes and secondary sanctions exposure for non-U.S. persons dealing with designated parties.",
+      "date": "2025-11-08",
+      "whyItMatters": "These sanctions increase compliance complexity for energy trading, shipping, and financial institutions with exposure to the Middle East, and heighten legal risks around indirect dealings with Iran-linked networks. Investors must reassess counterparties, supply chains, and trade finance arrangements to avoid secondary sanctions and reputational damage.",
+      "region": "North America",
+      "source": "U.S. Treasury / Reuters",
+      "tags": ["sanctions", "geopolitics", "energy", "compliance"],
+      "url": "https://home.treasury.gov/news/press-releases",
+      "nbimSentiment": "bearish"
+    },
+    {
+      "title": "SEC Intensifies Crypto Enforcement With Charges Against Major Exchange for Unregistered Securities Trading",
+      "summary": "The SEC filed a new enforcement action against a large crypto trading platform, alleging operation of an unregistered securities exchange, broker, and clearing agency, and offering unregistered securities through staking and lending products. The complaint also cites deficiencies in internal controls and misleading disclosures.",
+      "date": "2025-11-04",
+      "whyItMatters": "The case signals continued regulatory hostility toward certain crypto market structures and reinforces the SEC’s expansive view of what constitutes a securities offering. It increases legal and regulatory risk premia for crypto-exposed issuers and service providers, and may accelerate market consolidation toward more compliant or offshore venues.",
+      "region": "North America",
+      "source": "U.S. SEC / FT",
+      "tags": ["securities regulation", "crypto", "enforcement", "markets"],
+      "url": "https://www.sec.gov/litigation",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "U.S. CFTC and SEC Issue Joint Statement on Margin and Capital Treatment of Tokenized Securities",
+      "summary": "The CFTC and SEC jointly clarified how existing margin, capital, and segregation rules apply to broker-dealers and FCMs handling tokenized securities and derivatives. The statement emphasizes that tokenization does not alter regulatory classifications and that firms must maintain traditional protections, including customer asset segregation and risk management standards.",
+      "date": "2025-11-01",
+      "whyItMatters": "This reduces some legal uncertainty for institutions exploring tokenized instruments while underscoring that existing regulatory obligations remain fully applicable. It affects how global banks and brokers design tokenized settlement and collateral management systems, with implications for infrastructure investment and compliance costs.",
+      "region": "North America",
+      "source": "CFTC / SEC / Bloomberg",
+      "tags": ["securities regulation", "derivatives", "crypto", "policy"],
+      "url": "https://www.cftc.gov/PressRoom/PressReleases",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "Bank of Canada Holds Rate; Signals Readiness to Cut if Growth Weakens Further",
+      "summary": "The Bank of Canada left its policy rate unchanged but flagged that slowing growth and moderating inflation could justify rate cuts if downside risks materialize. The statement toned down prior hawkish language and stressed data dependence, prompting markets to price in earlier easing.",
+      "date": "2025-11-06",
+      "whyItMatters": "A shift toward potential easing affects CAD pricing, Canadian bank margins, and valuation of rate-sensitive Canadian assets. For global investors, it highlights policy divergence versus the Fed and may influence relative value trades in North American sovereigns and credit.",
+      "region": "North America",
+      "source": "Bank of Canada / Reuters",
+      "tags": ["monetary policy", "markets", "macro"],
+      "url": "https://www.bankofcanada.ca/2025/11/fad-press-release-2025-11-06/",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "U.S. Treasury Finalizes Beneficial Ownership Reporting Rules for Investment Vehicles under Corporate Transparency Act",
+      "summary": "FinCEN issued final rules clarifying beneficial ownership reporting obligations for certain pooled investment vehicles, private funds, and SPVs under the Corporate Transparency Act. Some structures managed by registered investment advisers receive limited exemptions, but many vehicles will now face mandatory reporting of ultimate owners and control persons.",
+      "date": "2025-11-07",
+      "whyItMatters": "The rules tighten transparency on private capital structures, impacting fund formation, KYC processes, and confidentiality expectations of investors. This may modestly raise administrative costs but reduce regulatory and reputational risk related to money laundering or sanctions evasion in opaque structures.",
+      "region": "North America",
+      "source": "FinCEN / Politico",
+      "tags": ["AML", "beneficial ownership", "regulation", "funds"],
+      "url": "https://www.fincen.gov/news/news-releases",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "Mexico Issues New Rules to Strengthen Pension Fund ESG Disclosure and Risk Management",
+      "summary": "Mexico’s CONSAR published updated guidelines for AFORES (pension funds) requiring enhanced disclosure on ESG integration, climate risk assessments, and stewardship activities. The rules also encourage scenario analysis for climate-related financial risks and introduce standardized reporting templates.",
+      "date": "2025-11-02",
+      "whyItMatters": "This aligns Mexico more closely with global sustainable finance standards and may redirect domestic capital flows toward assets with better ESG profiles. Foreign issuers and funds tapping Mexican pension capital may face higher expectations on ESG disclosure and long-term risk management.",
+      "region": "North America",
+      "source": "CONSAR / local media",
+      "tags": ["ESG", "pensions", "regulation", "disclosure"],
+      "url": "https://www.gob.mx/consar",
+      "nbimSentiment": "bullish"
+    }
+  ],
+  "Europe": [
+    {
+      "title": "ECB Keeps Rates Unchanged but Signals Potential Cuts in 2026 as Growth Slows",
+      "summary": "The European Central Bank left key policy rates steady, reiterating that inflation is converging toward target but underlying pressures remain. President Lagarde indicated that if disinflation continues and growth stays weak, the Governing Council could consider gradual cuts in 2026, prompting shifts in euro-area yield curves.",
+      "date": "2025-11-07",
+      "whyItMatters": "ECB communications shape expectations for euro sovereign yields, bank profitability, and refinancing conditions for corporates. The prospect of eventual easing supports duration but underscores risks in euro-area banks and peripheral sovereigns if growth remains anemic.",
+      "region": "Europe",
+      "source": "ECB / Reuters",
+      "tags": ["monetary policy", "markets", "macro"],
+      "url": "https://www.ecb.europa.eu/press/pr/date/2025/html/index.en.html",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "EU Council and Parliament Reach Provisional Deal on Corporate Sustainability Due Diligence Directive (CSDDD) Implementation Timeline",
+      "summary": "EU co-legislators reached a political agreement on phased implementation of the CSDDD, adjusting turnover and employee thresholds and extending deadlines for smaller in-scope companies. The compromise aims to preserve the directive’s core due-diligence obligations while addressing concerns about administrative burdens.",
+      "date": "2025-11-05",
+      "whyItMatters": "CSDDD will materially expand ESG and human-rights due-diligence obligations across EU and certain non-EU companies with EU operations, affecting supply-chain management and litigation risk. Investors must factor in higher compliance costs, potential liability in high-risk sectors, and data needs for engagement and stewardship.",
+      "region": "Europe",
+      "source": "EU Council / Politico Europe",
+      "tags": ["ESG", "regulation", "supply chain", "corporate governance"],
+      "url": "https://www.consilium.europa.eu/en/press/press-releases/",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "ESMA Issues Final Guidelines on ESG Fund Names and Greenwashing Risk",
+      "summary": "ESMA published final guidelines restricting the use of ESG-, sustainability-, or impact-related terms in fund names unless minimum investment and exclusion criteria are met. The guidelines apply to UCITS and AIFs marketed in the EU and introduce a transition period for existing funds to adjust.",
+      "date": "2025-11-01",
+      "whyItMatters": "These rules may trigger rebranding or portfolio rebalancing across European funds and create clearer differentiation for genuinely sustainable strategies. Stricter naming standards should reduce greenwashing risk but impose compliance and data challenges for cross-border managers distributing into the EU.",
+      "region": "Europe",
+      "source": "ESMA / FT",
+      "tags": ["ESG", "funds", "securities regulation", "disclosure"],
+      "url": "https://www.esma.europa.eu/press-news/esma-news",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "UK FCA Proposes New Rules on Private Markets Valuation and Liquidity Risk",
+      "summary": "The UK Financial Conduct Authority launched a consultation on strengthening valuation governance and liquidity-risk management for funds with significant private asset exposure. Proposals include stress-testing, independent valuation oversight, and enhanced disclosures on redemption terms and gating mechanisms.",
+      "date": "2025-11-04",
+      "whyItMatters": "This increases regulatory scrutiny of private markets strategies, especially semi-liquid vehicles marketed to retail and defined-contribution pensions. Managers may face higher operational costs, but better risk controls could reduce tail risks and increase investor confidence in UK-domiciled alternative funds.",
+      "region": "Europe",
+      "source": "FCA / Bloomberg",
+      "tags": ["funds", "securities regulation", "liquidity risk", "private markets"],
+      "url": "https://www.fca.org.uk/news",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "EU Sanctions Package Adds Russian LNG, Shipping, and Tech Entities to Restrictive List",
+      "summary": "The EU adopted a new sanctions package expanding measures against Russia, adding LNG-related firms, shipping companies, and technology suppliers to its restrictive list. The package tightens export controls, expands asset freezes, and introduces additional reporting obligations for EU financial institutions.",
+      "date": "2025-11-03",
+      "whyItMatters": "The broader sanctions regime increases compliance and counterparty risk for energy, shipping, and industrial supply chains involving Russia or third-country intermediaries. Investors must reassess holdings and financing exposures to potentially impacted entities and adjust sanctions screening processes.",
+      "region": "Europe",
+      "source": "EU Council / Reuters",
+      "tags": ["sanctions", "geopolitics", "energy", "compliance"],
+      "url": "https://www.consilium.europa.eu/en/press/press-releases/",
+      "nbimSentiment": "bearish"
+    },
+    {
+      "title": "Germany Adopts Law Tightening Foreign Direct Investment Screening in Critical Technologies",
+      "summary": "Germany’s Bundestag passed legislation expanding the scope of FDI screening to cover a broader set of critical technologies, including AI, quantum computing, and advanced semiconductors. The law lowers review thresholds and lengthens possible review periods for sensitive acquisitions by non-EU investors.",
+      "date": "2025-11-08",
+      "whyItMatters": "Stricter FDI controls heighten execution risk and timelines for cross-border M&A into German tech and industrial assets, particularly from strategic or state-linked investors. This may depress valuations for some targets but increase perceived security of supply chains and IP from an EU strategic autonomy standpoint.",
+      "region": "Europe",
+      "source": "German Federal Government / local media",
+      "tags": ["FDI", "national security", "technology", "policy"],
+      "url": "https://www.bmwi.de/Navigation/EN/Home/home.html",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "France Issues Decree Mandating Climate Transition Plans for Large Listed Companies",
+      "summary": "The French government enacted a decree requiring large listed companies and certain financial institutions to publish detailed climate transition plans aligned with national and EU climate objectives. The plans must include interim targets, capex alignment, and governance structures, subject to supervisory review.",
+      "date": "2025-11-02",
+      "whyItMatters": "This deepens France’s climate disclosure regime beyond SFDR and CSRD, pressing high-emission sectors to clarify decarbonisation pathways and investment needs. It may influence capital allocation away from laggards and provides investors with more granular data for climate risk analysis and engagement.",
+      "region": "Europe",
+      "source": "French Government / Le Monde",
+      "tags": ["ESG", "climate", "disclosure", "corporate governance"],
+      "url": "https://www.legifrance.gouv.fr/",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "EU Finalizes Rules on Third-Country Central Counterparties Access and Supervisory Powers",
+      "summary": "The European Commission adopted implementing rules under EMIR 3.0 that strengthen ESMA’s supervisory powers over systemically important third-country CCPs and refine the criteria for tiering and recognition. The framework could, in extremis, require relocation of certain euro-denominated clearing activities into the EU.",
+      "date": "2025-11-06",
+      "whyItMatters": "This affects global derivatives markets, particularly clearing of euro rates and repos currently concentrated in London and U.S. CCPs. Clearing members and asset owners may face higher costs and operational complexity if activities shift or fragmentation increases, influencing liquidity and collateral management.",
+      "region": "Europe",
+      "source": "European Commission / FT",
+      "tags": ["derivatives", "markets", "systemic risk", "regulation"],
+      "url": "https://finance.ec.europa.eu/news/index_en",
+      "nbimSentiment": "neutral"
+    }
+  ],
+  "Asia": [
+    {
+      "title": "Bank of Japan Adjusts Yield Curve Control, Allowing More Flexibility in 10-Year JGB Yields",
+      "summary": "The Bank of Japan modified its yield curve control framework, widening the tolerance band for 10-year JGB yields and signaling greater flexibility in market operations. While maintaining negative short-term rates, the BOJ reduced the frequency of fixed-rate JGB purchases.",
+      "date": "2025-11-07",
+      "whyItMatters": "A more flexible YCC framework may lead to higher Japanese yields and encourage repatriation flows from Japanese investors, impacting global fixed-income markets. It could pressure global risk assets sensitive to funding costs and shift hedging demand in FX and rates markets.",
+      "region": "Asia",
+      "source": "Bank of Japan / Bloomberg",
+      "tags": ["monetary policy", "markets", "bonds"],
+      "url": "https://www.boj.or.jp/en/announcements/release_2025/index.htm",
+      "nbimSentiment": "bearish"
+    },
+    {
+      "title": "China Unveils Measures to Attract Foreign Portfolio Investment and Ease QFII Procedures",
+      "summary": "China’s securities regulator and SAFE announced steps to simplify account opening, FX conversion, and cross-border remittance for Qualified Foreign Institutional Investors (QFII) and RQFII. The measures also broaden permissible investment scopes, including certain derivatives and margin trading.",
+      "date": "2025-11-03",
+      "whyItMatters": "Easier access for foreign investors may deepen liquidity in onshore equity and bond markets and support China’s weight in global indices. However, governance and geopolitical risks remain, so investors must balance improved market access against legal and policy uncertainty.",
+      "region": "Asia",
+      "source": "CSRC / Reuters",
+      "tags": ["market access", "securities regulation", "capital flows"],
+      "url": "http://www.csrc.gov.cn/",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "India’s SEBI Tightens Disclosure and Governance Rules for Large Unlisted Subsidiaries of Listed Companies",
+      "summary": "SEBI approved regulations requiring listed companies to make enhanced disclosures on material unlisted subsidiaries, including financial performance, related-party transactions, and governance practices. The rules aim to curb value leakage and improve transparency in complex group structures.",
+      "date": "2025-11-01",
+      "whyItMatters": "Heightened oversight of unlisted affiliates reduces opacity around group cash flows and risk transfer, which is critical for credit and equity analysis. It may improve minority shareholder protection and reduce governance discounts in Indian conglomerates.",
+      "region": "Asia",
+      "source": "SEBI / local media",
+      "tags": ["corporate governance", "securities regulation", "disclosure"],
+      "url": "https://www.sebi.gov.in/media/press-releases",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "Hong Kong SFC Publishes Licensing Guidance for Virtual Asset Trading Platforms Serving Retail Investors",
+      "summary": "The Hong Kong SFC released updated guidance detailing licensing, custody, token-admission, and investor-protection requirements for virtual asset trading platforms open to retail clients. Platforms must meet stringent governance and capital standards and implement robust suitability and disclosure frameworks.",
+      "date": "2025-11-04",
+      "whyItMatters": "The move reinforces Hong Kong’s push to position itself as a regulated virtual-assets hub, influencing the regional competitive landscape against Singapore and others. It provides clearer parameters for institutional participation in Hong Kong-based platforms but also raises compliance barriers for smaller players.",
+      "region": "Asia",
+      "source": "SFC / Bloomberg",
+      "tags": ["crypto", "securities regulation", "market structure"],
+      "url": "https://www.sfc.hk/en/News-and-announcements/Policy-statements-and-announcements",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "Singapore MAS Announces Enhanced Climate Disclosure Standards Aligned with ISSB",
+      "summary": "The Monetary Authority of Singapore set out a roadmap for mandatory climate-related financial disclosures for listed issuers and large corporates, anchored in ISSB standards. Implementation will be phased in, with high-emission sectors prioritized and supervisory expectations articulated for financial institutions.",
+      "date": "2025-11-02",
+      "whyItMatters": "ISSB-aligned disclosures improve cross-market comparability of climate data, aiding investment analysis and stewardship. For issuers, the rules raise reporting and governance expectations and may affect access to capital for entities with weak transition strategies.",
+      "region": "Asia",
+      "source": "MAS / FT",
+      "tags": ["ESG", "disclosure", "climate", "regulation"],
+      "url": "https://www.mas.gov.sg/news/media-releases",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "South Korea Strengthens Short-Selling Rules and Market Surveillance After Volatility Episodes",
+      "summary": "South Korea’s Financial Services Commission announced tougher enforcement and disclosure measures for short selling, including higher penalties for naked shorting and enhanced reporting obligations for large positions. The move follows episodes of market volatility and political scrutiny of foreign investors’ practices.",
+      "date": "2025-11-06",
+      "whyItMatters": "Stricter rules could curb some trading strategies and impact liquidity in Korean equities, particularly for hedge funds and quantitative investors. It also illustrates heightened political sensitivity to market fairness and may foreshadow further populist-tinged regulatory shifts.",
+      "region": "Asia",
+      "source": "FSC Korea / Reuters",
+      "tags": ["securities regulation", "markets", "enforcement"],
+      "url": "https://www.fsc.go.kr/eng/pr010101",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "Japan Expands Economic Security Law to Cover More Sectors and Data Flows",
+      "summary": "Japan passed amendments expanding its economic security law to additional sectors such as pharmaceuticals, data centers, and advanced materials. The revisions toughen screening of foreign investment and regulate cross-border transfers of sensitive data and technologies.",
+      "date": "2025-11-05",
+      "whyItMatters": "The expanded regime increases regulatory risk and transaction friction for foreign investors pursuing strategic assets in Japan, especially in tech and critical infrastructure. It also adds compliance burdens related to data governance and cross-border data flows for multinational firms.",
+      "region": "Asia",
+      "source": "Japanese Government / Nikkei",
+      "tags": ["FDI", "national security", "data", "policy"],
+      "url": "https://www.cas.go.jp/jp/",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "China Imposes Export Controls on Certain Rare Earth Processing Technologies",
+      "summary": "China’s Ministry of Commerce and Ministry of Science and Technology announced new export controls on specific rare-earth separation and processing technologies, citing national security and resource protection. Exporters will require licenses, and foreign recipients may face additional end-use scrutiny.",
+      "date": "2025-11-08",
+      "whyItMatters": "This measure tightens China’s leverage over critical materials supply chains, impacting global EV, renewable energy, and electronics industries. It may accelerate diversification of supply and increase geopolitical risk premia for companies reliant on Chinese inputs.",
+      "region": "Asia",
+      "source": "MOFCOM / Reuters",
+      "tags": ["export controls", "geopolitics", "commodities", "technology"],
+      "url": "http://english.mofcom.gov.cn/",
+      "nbimSentiment": "bearish"
+    }
+  ],
+  "Oceania": [
+    {
+      "title": "Reserve Bank of Australia Holds Cash Rate; Warns of Upside Inflation Risks",
+      "summary": "The RBA decided to keep the cash rate unchanged but highlighted that persistent service inflation and a tight labor market could require renewed tightening if upside risks materialize. Market expectations for near-term cuts were pared back following the statement.",
+      "date": "2025-11-05",
+      "whyItMatters": "The RBA’s stance affects AUD valuation, Australian bond yields, and financing conditions for households and corporates, with spillovers to regional risk sentiment. Higher-for-longer rates would pressure rate-sensitive sectors like real estate while supporting bank margins.",
+      "region": "Oceania",
+      "source": "RBA / Bloomberg",
+      "tags": ["monetary policy", "markets", "macro"],
+      "url": "https://www.rba.gov.au/media-releases/2025/",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "Australia Finalizes Mandatory Climate Disclosure Regime for Large Companies and Financial Institutions",
+      "summary": "The Australian government confirmed legislation introducing mandatory climate-related financial disclosures for large listed entities, banks, insurers, and superannuation funds, based on ISSB standards. The regime includes phased implementation and regulator powers to enforce compliance.",
+      "date": "2025-11-01",
+      "whyItMatters": "This is a major step in aligning Australia’s corporate reporting with global climate norms, expanding data available for risk assessment and engagement. Entities with high transition risk may face higher capital costs, while the regime benefits investors seeking consistent ESG information.",
+      "region": "Oceania",
+      "source": "Australian Treasury / Reuters",
+      "tags": ["ESG", "climate", "disclosure", "regulation"],
+      "url": "https://treasury.gov.au/media-releases",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "ASIC Launches Enforcement Actions Over Greenwashing in Superannuation and Managed Funds",
+      "summary": "ASIC announced a series of enforcement actions and infringement notices against several superannuation funds and managed investment schemes for alleged greenwashing in marketing materials and disclosures. Cases focus on overstated sustainability credentials and inadequate explanation of screening methodologies.",
+      "date": "2025-11-06",
+      "whyItMatters": "The actions signal heightened regulatory intolerance for ESG misrepresentation, raising legal and reputational risks for fund managers in Australia. Managers will need stronger internal controls over product design and communication, which could improve product integrity but increase compliance costs.",
+      "region": "Oceania",
+      "source": "ASIC / local media",
+      "tags": ["ESG", "enforcement", "funds", "disclosure"],
+      "url": "https://asic.gov.au/about-asic/news-centre/find-a-media-release/",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "New Zealand Reserve Bank Confirms Macroprudential Toolkit Expansion for Housing Risks",
+      "summary": "The Reserve Bank of New Zealand finalized the framework for new macroprudential tools, including debt-to-income (DTI) and interest-coverage ratio limits for residential lending. The tools are designed to address systemic risks from high household leverage and housing market imbalances.",
+      "date": "2025-11-03",
+      "whyItMatters": "Stronger macroprudential tools may dampen housing credit growth and affect construction and consumer sectors, while lowering systemic risk in the banking system. For investors, it alters the risk-return profile of NZ mortgages, bank equity, and housing-related equities.",
+      "region": "Oceania",
+      "source": "RBNZ / Bloomberg",
+      "tags": ["macroprudential", "housing", "banks", "financial stability"],
+      "url": "https://www.rbnz.govt.nz/news",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "Australian Government Tightens Critical Minerals Investment Screening Under FATA",
+      "summary": "Australia updated its Foreign Acquisitions and Takeovers Act (FATA) guidance to subject a wider range of critical minerals projects to national-interest review, particularly where foreign state-linked investors are involved. The regime emphasizes security of supply chains and alignment with allied countries.",
+      "date": "2025-11-04",
+      "whyItMatters": "Tighter screening raises regulatory and execution risk for cross-border M&A and JV deals in Australian critical minerals, potentially affecting valuations and project financing. It may also reinforce Australia’s strategic role in non-China supply chains for EVs and renewables.",
+      "region": "Oceania",
+      "source": "Australian FIRB / Reuters",
+      "tags": ["FDI", "national security", "commodities", "policy"],
+      "url": "https://firb.gov.au/news",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "APRA Updates Prudential Standards on Operational Risk and Third-Party Outsourcing",
+      "summary": "APRA released revisions to its prudential standards on operational risk management and outsourcing for banks and insurers, emphasizing third-party and cloud-service dependencies. The new standards require more rigorous risk assessments, board oversight, and incident reporting.",
+      "date": "2025-11-07",
+      "whyItMatters": "Stronger operational-risk standards should reduce the likelihood and impact of technology and cyber incidents but impose additional compliance and IT governance costs. This influences banks’ vendor strategies and could shape how financial institutions adopt new technologies.",
+      "region": "Oceania",
+      "source": "APRA / local media",
+      "tags": ["prudential regulation", "operational risk", "cybersecurity"],
+      "url": "https://www.apra.gov.au/news-and-publications",
+      "nbimSentiment": "neutral"
+    }
+  ],
+  "Latin America": [
+    {
+      "title": "Brazil’s Central Bank Cuts Selic Rate but Signals Pause as Inflation Risks Rise",
+      "summary": "Brazil’s COPOM reduced the Selic policy rate but indicated that future cuts are uncertain amid renewed inflationary pressures and fiscal concerns. The statement was interpreted as a dovish move with a more cautious forward guidance.",
+      "date": "2025-11-06",
+      "whyItMatters": "Changes in Brazil’s rate trajectory affect currency dynamics, local bond yields, and equity valuations, especially in financials and domestic cyclicals. Rising fiscal and inflation risks can widen risk premia for Brazilian assets and influence foreign portfolio allocations.",
+      "region": "Latin America",
+      "source": "Banco Central do Brasil / Reuters",
+      "tags": ["monetary policy", "markets", "macro"],
+      "url": "https://www.bcb.gov.br/en/press",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "Brazil CVM Issues Rules to Curb Greenwashing in ESG Investment Funds",
+      "summary": "Brazil’s securities regulator CVM approved new rules for ESG-labelled funds, requiring funds to define ESG strategies clearly, set measurable criteria, and provide periodic impact and allocation reports. Funds that fail to meet criteria may be forced to rebrand or adjust portfolios.",
+      "date": "2025-11-01",
+      "whyItMatters": "The move aligns Brazil’s fund regulation with international ESG standards, improving transparency for investors and potentially attracting more sustainable capital. Managers will need better data and governance to substantiate ESG claims, affecting product design and reporting systems.",
+      "region": "Latin America",
+      "source": "CVM / local media",
+      "tags": ["ESG", "funds", "securities regulation", "disclosure"],
+      "url": "https://www.gov.br/cvm/pt-br/assuntos/noticias",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "Mexico’s Central Bank Leaves Rate Unchanged, Emphasizes Data-Dependent Path",
+      "summary": "Banxico kept its key interest rate unchanged, stressing that future decisions will depend on inflation dynamics and external conditions, particularly U.S. monetary policy. The board highlighted risks from peso volatility and administered prices.",
+      "date": "2025-11-07",
+      "whyItMatters": "Banxico’s stance influences MXN assets and carry trade attractiveness, impacting flows into Mexican government bonds and local credit. A cautious policy approach may help anchor inflation expectations but could constrain growth-sensitive sectors.",
+      "region": "Latin America",
+      "source": "Banxico / Bloomberg",
+      "tags": ["monetary policy", "markets", "macro"],
+      "url": "https://www.banxico.org.mx/publicaciones-y-prensa/anuncios-de-politica-monetaria/",
+      "nbimSentiment": "neutral"
+    },
+    {
+      "title": "Chile Implements New Tax Incentives and Regulatory Framework for Green Hydrogen Projects",
+      "summary": "Chile enacted legislation providing tax incentives, streamlined permitting, and regulatory clarity for large-scale green hydrogen and renewable energy projects. The framework includes rules on land use, grid connections, and environmental impact assessments.",
+      "date": "2025-11-02",
+      "whyItMatters": "The law aims to position Chile as a leader in green hydrogen, potentially attracting significant FDI into infrastructure and export-oriented projects. Investors gain more regulatory certainty but must manage environmental and community-related permitting risks.",
+      "region": "Latin America",
+      "source": "Chilean Government / FT",
+      "tags": ["energy", "ESG", "policy", "FDI"],
+      "url": "https://www.gob.cl/en/news/",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "Argentina Introduces Temporary Capital Controls to Stabilize Peso Amid Political Transition",
+      "summary": "Argentina’s central bank and government imposed new temporary capital controls limiting FX purchases and certain cross-border transfers in response to currency pressures during a political transition. The measures include stricter import payment rules and restrictions on dividend remittances.",
+      "date": "2025-11-05",
+      "whyItMatters": "Capital controls heighten FX and convertibility risk for foreign investors, complicating exit strategies, dividend flows, and debt service. This may further depress valuations of Argentine assets and deter new foreign investment until policy visibility improves.",
+      "region": "Latin America",
+      "source": "Argentine Central Bank / Reuters",
+      "tags": ["capital controls", "FX", "geopolitics", "policy"],
+      "url": "https://www.bcra.gob.ar/Noticias/",
+      "nbimSentiment": "bearish"
+    },
+    {
+      "title": "Colombia’s Financial Regulator Issues Climate Risk Management Guidelines for Banks and Insurers",
+      "summary": "Colombia’s Superintendencia Financiera released guidelines requiring banks and insurers to incorporate climate-related physical and transition risks into governance, risk management, and disclosures. The guidance encourages scenario analysis and stress testing, though initially on a comply-or-explain basis.",
+      "date": "2025-11-03",
+      "whyItMatters": "This pushes Colombian financial institutions toward global best practices on climate risk, influencing credit allocation and pricing for high-emission sectors. It also improves transparency for investors assessing climate vulnerability in the Colombian financial system.",
+      "region": "Latin America",
+      "source": "Superintendencia Financiera de Colombia / local media",
+      "tags": ["ESG", "climate", "banks", "regulation"],
+      "url": "https://www.superfinanciera.gov.co/inicio/sala-de-prensa-10094",
+      "nbimSentiment": "bullish"
+    },
+    {
+      "title": "Peru Strengthens Anti-Corruption and Procurement Rules for Public Infrastructure Projects",
+      "summary": "Peru enacted legal reforms tightening anti-corruption controls, transparency, and bidding requirements for public infrastructure and PPP projects, in response to past scandals. The law mandates enhanced disclosure of beneficial owners of contractors and introduces stricter sanctions for bid-rigging and bribery.",
+      "date": "2025-11-04",
+      "whyItMatters": "Improved governance in infrastructure procurement may reduce legal and reputational risks for foreign investors partnering with public entities, though compliance costs and documentation requirements will rise. Over time, cleaner procurement could lower project risk premia.",
+      "region": "Latin America",
+      "source": "Peruvian Government / AP",
+      "tags": ["anti-corruption", "infrastructure", "policy", "AML"],
+      "url": "https://www.gob.pe/institucion/presidencia/noticias",
+      "nbimSentiment": "bullish"
+    }
+  ]
+}
