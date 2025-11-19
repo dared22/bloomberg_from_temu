@@ -2,6 +2,57 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import json
+import tls_client
+from fetch_news import NewsExtractor
+
+#config
+MAX_SNIPPET_LEN = 800
+
+session = tls_client.Session(
+    client_identifier="chrome_120",
+    random_tls_extension_order=True,
+)
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+KEYWORDS = {
+    "North America": [
+        "US financial regulation",
+        "US sanctions policy",
+    ],
+    "Europe": [
+        "EU regulation",
+        "EU sanctions policy",
+    ],
+    "Asia": [
+        "Asia financial regulation",
+        "Asia central bank policy",
+    ],
+    "Oceania": [
+        "Australia financial regulation",
+        "New Zealand financial regulation",
+    ],
+    "Latin America": [
+        "Latin America financial regulation",
+        "Brazil financial regulation",
+    ],
+}
+
+
+extractor = NewsExtractor(
+    snippet_len=MAX_SNIPPET_LEN,
+    header=HEADERS,
+    keywords=KEYWORDS,
+    session=session
+)
+
+articles = extractor.fetch_all()
+
+
+
 
 st.set_page_config(page_title="Regulatory Intelligence", page_icon="📰", layout="wide")
 st.markdown(
