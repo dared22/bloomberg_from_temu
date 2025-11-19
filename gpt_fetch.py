@@ -35,7 +35,7 @@ You MUST categorize results by REGION:
 - Oceania
 - Latin America
 
-For each region, return 5–10 of the most relevant new items from the last 14 days.
+For each region, return 8–10 of the most relevant new items from the last 14 days.
 
 For each item include:
 - title
@@ -45,19 +45,22 @@ For each item include:
 - region
 - source (e.g., Reuters, FT, Bloomberg, Politico, AP, Gov. press release)
 - tags (e.g. regulation, ESG, sanctions, markets, policy, sovereign wealth funds)
+- url (direct link to the article or release)
 
 Format the final answer as VALID JSON:
 
 {
-  "NorthAmerica": [],
+  "North America": [],
   "Europe": [],
   "Asia": [],
   "Oceania": [],
-  "LatinAmerica": []
+  "Latin America": []
 }
 
 Your output must be factual, concise, and policy-focused.
 Do not invent laws or policies; use only widely reported regulatory events.
+
+Additionally, for each item include a sentiment classification for NBIM (bullish, neutral, or bearish) based on likely impact on NBIM/GPFG: use "bullish" if positive for NBIM's assets/influence, "bearish" if negative or risk-enhancing, otherwise "neutral". Add this as a field named "nbimSentiment".
 """
 
 USER_PROMPT = "Provide the latest regulatory news globally."
@@ -74,7 +77,7 @@ def msg(role, text):
     }
 
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-5.1",
     messages=[
         msg("system", SYSTEM_PROMPT),
         msg("user", USER_PROMPT)
@@ -83,7 +86,7 @@ response = client.chat.completions.create(
 
 content = response.choices[0].message.content
 
-# content is a list of MessageContent objects
-# Each one has: .type and .text
 print(content)
 
+with open("output.json", "w") as f:
+    f.write(content)
