@@ -1,8 +1,6 @@
 import hashlib
-import json
 import re
 import time
-import tls_client
 from bs4 import BeautifulSoup
 from email.utils import parsedate_to_datetime
 
@@ -107,7 +105,7 @@ class NewsExtractor:
         for idx, art in enumerate(articles_sorted):
             art["id"] = idx
 
-        print(f"Saved {len(articles_sorted)} regulatory articles.")
+        print(f"Found {len(articles_sorted)} regulatory articles.")
 
         return articles_sorted
 

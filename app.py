@@ -4,43 +4,16 @@ import altair as alt
 import json
 import tls_client
 from fetch_news import NewsExtractor
+from openai import AsyncOpenAI
+import asyncio
+from classifier import NewsClassifier
+from config import SYSTEM_PROMPT, JSON_SCHEMA, MAX_SNIPPET_LEN, HEADERS, KEYWORDS
 
-#config
-MAX_SNIPPET_LEN = 800
 
 session = tls_client.Session(
     client_identifier="chrome_120",
     random_tls_extension_order=True,
 )
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0",
-    "Accept-Language": "en-US,en;q=0.9",
-}
-
-KEYWORDS = {
-    "North America": [
-        "US financial regulation",
-        "US sanctions policy",
-    ],
-    "Europe": [
-        "EU regulation",
-        "EU sanctions policy",
-    ],
-    "Asia": [
-        "Asia financial regulation",
-        "Asia central bank policy",
-    ],
-    "Oceania": [
-        "Australia financial regulation",
-        "New Zealand financial regulation",
-    ],
-    "Latin America": [
-        "Latin America financial regulation",
-        "Brazil financial regulation",
-    ],
-}
-
 
 extractor = NewsExtractor(
     snippet_len=MAX_SNIPPET_LEN,
@@ -51,8 +24,17 @@ extractor = NewsExtractor(
 
 articles = extractor.fetch_all()
 
+client = AsyncOpenAI()
 
+classifier = NewsClassifier(
+    client=client,
+    json_schema=JSON_SCHEMA,
+    prompt=SYSTEM_PROMPT,
+    articles=articles,
+    model="gpt-5-mini",
+)
 
+result = asyncio.run(classifier.main(batch_size=25, max_parallel=6))
 
 st.set_page_config(page_title="Regulatory Intelligence", page_icon="📰", layout="wide")
 st.markdown(
@@ -90,11 +72,9 @@ st.markdown(
 )
 
 
-with open("regulatory_news.json") as f:
-    articles_by_region = json.load(f)
 
 flat_articles = []
-for region, items in articles_by_region.items():
+for region, items in result.items():
     for art in items:
         copy = art.copy()
         copy["region"] = region
@@ -136,7 +116,7 @@ st.divider()
 
 
 sentiment_counts = {}
-for region, items in articles_by_region.items():
+for region, items in result.items():
     sentiment_counts[region] = {"bullish": 0, "neutral": 0, "bearish": 0}
     for a in items:
         sentiment_counts[region][get_sentiment(a)] += 1
@@ -151,7 +131,7 @@ chart = (
     alt.Chart(df_sent)
     .mark_bar()
     .encode(
-        x=alt.X("Region:N", sort=list(articles_by_region.keys())),
+        x=alt.X("Region:N", sort=list(result.keys())),
         xOffset="Sentiment",
         y=alt.Y("Count:Q", title="Articles"),
         color=alt.Color(
@@ -185,7 +165,7 @@ col_search, col_region, col_sent = st.columns([3, 1, 1])
 search_query = col_search.text_input(
     "Search by institution or title...", placeholder="Search..."
 )
-region_options = ["All Regions"] + list(articles_by_region.keys())
+region_options = ["All Regions"] + list(result.keys())
 selected_region = col_region.selectbox("Region", region_options)
 sentiment_options = ["All Sentiment", "bullish", "neutral", "bearish"]
 selected_sentiment = col_sent.selectbox("Sentiment", sentiment_options)
