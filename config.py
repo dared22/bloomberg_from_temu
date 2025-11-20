@@ -91,8 +91,7 @@ JSON_SCHEMA = {
                                 "Europe",
                                 "Asia",
                                 "Oceania",
-                                "Latin America",
-                                "Global"
+                                "Latin America"
                             ],
                         },
                         "source": {"type": "string"},
