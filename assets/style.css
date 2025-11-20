@@ -1,0 +1,188 @@
+:root {
+    --page-bg: #f4eee6;
+    --card-bg: #ffffff;
+    --text-primary: #0b1c38;
+    --text-secondary: #4b5563;
+    --border: #e4ded5;
+    --muted: #9ca3af;
+    --bearish: #e74c3c;
+    --neutral: #9fa6b2;
+    --bullish: #2563eb;
+}
+
+html, body, [data-testid="stAppViewContainer"] {
+    background: var(--page-bg) !important;
+    color: var(--text-primary) !important;
+    font-family: "Inter", sans-serif;
+}
+
+[data-testid="stHeader"] { background: transparent !important; }
+
+[data-testid="stAppViewContainer"] .main {
+    padding: 24px 48px 60px;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 24px;   
+}
+
+
+.nbim-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+.nbim-logo svg {
+    height: 56px;
+    width: auto;
+    display: block;
+    transform: translateY(9px);
+}
+
+.hero-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.page-header h1 {
+    margin: 0;
+    font-size: 26px;     
+    font-weight: 700;   
+    letter-spacing: -0.3px;
+}
+
+
+.page-header p {
+    margin: 2px 0 0 0;
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+
+.section-title {
+    font-size: 20px;       
+    font-weight: 600;      
+    color: #0b1c38;
+    margin: 10px 0 14px 0; 
+}
+
+
+.article-section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0px 0 12px;
+}
+
+.article-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 26px;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+    margin-bottom: 14px;
+}
+
+.article-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.article-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.sentiment-pill {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: lowercase;
+}
+
+.sentiment-pill[data-tone="bearish"] {
+    background: rgba(231, 76, 60, 0.15);
+    color: var(--bearish);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+.sentiment-pill[data-tone="neutral"] {
+    background: rgba(159, 166, 178, 0.15);
+    color: var(--neutral);
+    border: 1px solid rgba(159, 166, 178, 0.3);
+}
+.sentiment-pill[data-tone="bullish"] {
+    background: rgba(37, 99, 235, 0.15);
+    color: var(--bullish);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+.article-summary {
+    color: var(--text-secondary);
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+.article-why {
+    background: #f9f6f0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-top: 12px;
+}
+
+.article-why .label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.article-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 12px;
+}
+
+.article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.tag-chip {
+    background: #eef2ff;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.article-source {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.article-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--bullish);
+    margin-top: 10px;
+}
+
+.article-link::after { content: "↗"; }
+.article-link:hover { text-decoration: underline; }

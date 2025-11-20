@@ -96,7 +96,6 @@ class NewsClassifier:
             "Asia": [],
             "Oceania": [],
             "Latin America": [],
-            "Global": []
         }
 
         for art in results:
@@ -109,10 +108,6 @@ class NewsClassifier:
             ]
             if not all(k in art for k in required):
                 continue
-
-            region = art["region"]
-            if region not in final:
-                region = "Global"
 
             final[region].append({
                 "title": art["title"],

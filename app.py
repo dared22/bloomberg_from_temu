@@ -1,223 +1,219 @@
-import streamlit as st
-import pandas as pd
-import altair as alt
-import json
-import tls_client
-from fetch_news import NewsExtractor
-from openai import AsyncOpenAI
 import asyncio
+import json
+import os
+import threading
+from html import escape
+
+import altair as alt
+import pandas as pd
+import streamlit as st
+import tls_client
+from openai import AsyncOpenAI
+
 from classifier import NewsClassifier
+from fetch_news import NewsExtractor
 from config import SYSTEM_PROMPT, JSON_SCHEMA, MAX_SNIPPET_LEN, HEADERS, KEYWORDS
 
+CACHE_FILE = "regulatory_news.json"
+VALID_SENTIMENTS = {"bearish", "neutral", "bullish"}
 
-session = tls_client.Session(
-    client_identifier="chrome_120",
-    random_tls_extension_order=True,
-)
+st.set_page_config(page_title="NBIM News", page_icon="./assets/favicon.ico", layout="wide")
 
-extractor = NewsExtractor(
-    snippet_len=MAX_SNIPPET_LEN,
-    header=HEADERS,
-    keywords=KEYWORDS,
-    session=session
-)
+with open("assets/style.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+def load_cache():
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE) as f:
+            return json.load(f)
+    return {
+        "North America": [],
+        "Europe": [],
+        "Asia Pacific": [],
+        "Middle East": [],
+        "Latin America": []
+    }
+
+def save_cache(data):
+    with open(CACHE_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+def normalize_sentiment(a):
+    s = (a.get("nbimSentiment") or a.get("sentiment") or "neutral").lower().strip()
+    return s if s in VALID_SENTIMENTS else "neutral"
+
+cached = load_cache()
+
+session = tls_client.Session(client_identifier="chrome_120", random_tls_extension_order=True)
+extractor = NewsExtractor(snippet_len=MAX_SNIPPET_LEN, header=HEADERS, keywords=KEYWORDS, session=session)
 articles = extractor.fetch_all()
 
-client = AsyncOpenAI()
+if "running" not in st.session_state:
+    st.session_state["running"] = False
+if "refresh" not in st.session_state:
+    st.session_state["refresh"] = False
 
-classifier = NewsClassifier(
-    client=client,
-    json_schema=JSON_SCHEMA,
-    prompt=SYSTEM_PROMPT,
-    articles=articles,
-    model="gpt-5-mini",
-)
+def run_classifier():
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    loop = asyncio.get_event_loop()
+    client = AsyncOpenAI()
+    classifier = NewsClassifier(
+        client=client,
+        json_schema=JSON_SCHEMA,
+        prompt=SYSTEM_PROMPT,
+        articles=articles,
+        model="gpt-5-mini"
+    )
+    result = loop.run_until_complete(classifier.main(batch_size=25, max_parallel=6))
+    save_cache(result)
+    st.session_state["running"] = False
+    st.session_state["refresh"] = True
 
-result = asyncio.run(classifier.main(batch_size=25, max_parallel=6))
+if not st.session_state["running"]:
+    st.session_state["running"] = True
+    threading.Thread(target=run_classifier, daemon=True).start()
 
-st.set_page_config(page_title="Regulatory Intelligence", page_icon="📰", layout="wide")
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-color: #ffffff;
-    }
-    [data-testid="stAppViewContainer"] {
-        background: #ffffff;
-    }
-    [data-testid="stHeader"] {
-        background: transparent;
-    }
-    [data-testid="stSidebar"] {
-        background: #ffffff;
-    }
-    /* lighten the input controls */
-    .stTextInput > div > div > input,
-    .stSelectbox > div > div {
-        background: #ffffff !important;
-        color: #0f172a !important;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-    }
-    .stMultiSelect > div {
-        background: #ffffff !important;
-        color: #0f172a !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+if st.session_state["refresh"]:
+    st.session_state["refresh"] = False
+    st.experimental_rerun()
 
-
-
-flat_articles = []
-for region, items in result.items():
-    for art in items:
-        copy = art.copy()
-        copy["region"] = region
-        flat_articles.append(copy)
-
-
-def get_sentiment(article):
-    s = (article.get("nbimSentiment") or "").lower().strip()
-    if s in {"bullish", "bearish", "neutral"}:
-        return s
-    return "neutral"
-
-
-def sentiment_color(sentiment: str):
-    palette = {
-        "bullish": "#31c47e",  
-        "neutral": "#9aa4b5",  
-        "bearish": "#e45b5b", 
-    }
-    return palette.get(sentiment, "#9aa4b5")
-    
-
-
+with open("assets/logo.svg") as f:
+    logo_svg = f.read()
 
 st.markdown(
-    """
-    <div style="display:flex; align-items:center; gap:12px;">
-        <div style="width:44px; height:44px; border-radius:12px; background:#f5b63f; display:flex; align-items:center; justify-content:center; font-size:24px;">📰</div>
-        <div>
-            <div style="font-size:26px; font-weight:700; color:#0f172a;">Regulatory News NBIM</div>
-            <div style="color:#475569;"> Regulatory news relevant to NBIM's five biggest markets generated by ChatGPT</div>
+    f"""
+    <div class="page-header">
+        <div class="nbim-logo">{logo_svg}</div>
+        <div class="hero-text">
+            <h1>GPT News</h1>
+            <p>Regulatory news relevant to NBIM's five biggest markets classified by ChatGPT</p>
         </div>
     </div>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
-st.divider()
-
-
-sentiment_counts = {}
-for region, items in result.items():
-    sentiment_counts[region] = {"bullish": 0, "neutral": 0, "bearish": 0}
+rows = []
+for region, items in cached.items():
+    c = {"bearish": 0, "neutral": 0, "bullish": 0}
     for a in items:
-        sentiment_counts[region][get_sentiment(a)] += 1
+        c[normalize_sentiment(a)] += 1
+    for s, v in c.items():
+        rows.append([region, s.capitalize(), v])
 
-df_sent = (
-    pd.DataFrame.from_dict(sentiment_counts, orient="index")
-    .reset_index(names="Region")
-    .melt(id_vars="Region", var_name="Sentiment", value_name="Count")
-)
+df = pd.DataFrame(rows, columns=["Region", "Sentiment", "Count"])
+sent_colors = {"Bearish": "#e74c3c", "Neutral": "#9fa6b2", "Bullish": "#2563eb"}
+
+st.markdown("<div class='section-title'>Sentiment Analysis by Region</div>", unsafe_allow_html=True)
 
 chart = (
-    alt.Chart(df_sent)
-    .mark_bar()
+    alt.Chart(df)
+    .mark_bar(size=40, cornerRadius=6)
     .encode(
-        x=alt.X("Region:N", sort=list(result.keys())),
-        xOffset="Sentiment",
-        y=alt.Y("Count:Q", title="Articles"),
+        x=alt.X("Region:N", axis=alt.Axis(labelAngle=0)),
+        y="Count:Q",
         color=alt.Color(
             "Sentiment:N",
             scale=alt.Scale(
-                domain=["bearish", "neutral", "bullish"],
-                range=["#e45b5b", "#9aa4b5", "#31c47e"],
+                domain=list(sent_colors.keys()),
+                range=list(sent_colors.values())
             ),
+            legend=alt.Legend(orient="top", title=None),
         ),
-        tooltip=["Region", "Sentiment", "Count"],
+        xOffset="Sentiment:N",
     )
-    .properties(height=320, title="Sentiment Analysis by Region", background="#ffffff")
-    .configure_view(stroke="#e2e8f0", fill="#ffffff")
-    .configure_axis(domainColor="#e2e8f0", tickColor="#e2e8f0", labelColor="#475569", titleColor="#0f172a")
-    .configure_legend(
-        labelColor="#475569",
-        titleColor="#475569",
-        orient="right",
-        title=None,
-        padding=8,
-        labelFontSize=12,
+    .properties(height=360, background="transparent")
+    .configure_axis(
+        domainColor="#dcd4c8",
+        tickColor="#dcd4c8",
+        labelColor="#4b5563",
+        gridColor="#c7c7c7",
     )
+    .configure_view(fill=None, strokeWidth=0)
 )
 
-st.altair_chart(chart, use_container_width=True)
+st.altair_chart(chart, width="stretch")
 
 
-st.markdown("### ")
-col_search, col_region, col_sent = st.columns([3, 1, 1])
-
-search_query = col_search.text_input(
-    "Search by institution or title...", placeholder="Search..."
+col_search, col_region, col_sent = st.columns((5, 1.5, 1.5))
+search = col_search.text_input(
+    "Search articles",
+    placeholder="Search by institution or title...",
+    label_visibility="collapsed",
 )
-region_options = ["All Regions"] + list(result.keys())
-selected_region = col_region.selectbox("Region", region_options)
-sentiment_options = ["All Sentiment", "bullish", "neutral", "bearish"]
-selected_sentiment = col_sent.selectbox("Sentiment", sentiment_options)
+region_filter = col_region.selectbox(
+    "Filter by region",
+    ["All Regions"] + list(cached.keys()),
+    label_visibility="collapsed",
+)
+sent_filter = col_sent.selectbox(
+    "Filter by sentiment",
+    ["All Sentiment", "bearish", "neutral", "bullish"],
+    label_visibility="collapsed",
+)
 
+articles_all = []
+for region, items in cached.items():
+    for a in items:
+        x = a.copy()
+        x["region"] = region
+        x["sentiment"] = normalize_sentiment(a)
+        articles_all.append(x)
 
-def article_matches(article):
-    if selected_region != "All Regions" and article.get("region") != selected_region:
-        return False
-    if selected_sentiment != "All Sentiment" and get_sentiment(article) != selected_sentiment:
-        return False
-    if search_query:
-        haystack = (
-            (article.get("title") or "")
-            + (article.get("summary") or "")
-            + (article.get("why_it_matters") or article.get("whyItMatters") or "")
-            + (article.get("source") or "")
-        ).lower()
-        if search_query.lower() not in haystack:
-            return False
-    return True
+q = (search or "").lower().strip()
+filtered = []
+for a in articles_all:
+    text = " ".join([
+        a.get("title", ""),
+        a.get("summary", ""),
+        a.get("whyItMatters") or a.get("why_it_matters") or "",
+        a.get("source", ""),
+        " ".join(a.get("tags") or []),
+    ]).lower()
+    if q and q not in text:
+        continue
+    if region_filter != "All Regions" and a["region"] != region_filter:
+        continue
+    if sent_filter != "All Sentiment" and a["sentiment"] != sent_filter:
+        continue
+    filtered.append(a)
 
+st.markdown(f"<div class='article-section-title'>Latest Updates <span>({len(filtered)} articles)</span></div>", unsafe_allow_html=True)
 
-filtered_articles = [a for a in flat_articles if article_matches(a)]
+for a in filtered:
+    title = escape(a.get("title", ""))
+    summary = escape(a.get("summary", ""))
+    why = escape(a.get("whyItMatters") or a.get("why_it_matters") or "")
+    region = escape(a.get("region", ""))
+    date = escape(a.get("date", ""))
+    source = escape(a.get("source", ""))
+    url = escape(a.get("url", ""))
+    sentiment = a["sentiment"]
+    tags = a.get("tags") or []
+    tags_html = "".join(f"<span class='tag-chip'>{escape(str(t))}</span>" for t in tags)
+    why_html = f"<div class='article-why'><div class='label'>Why it matters</div><p>{why}</p></div>" if why else ""
+    link_html = f"<a class='article-link' href='{url}' target='_blank'>Open article</a>" if url else ""
 
-st.markdown(f"### Latest Updates ({len(filtered_articles)} articles)")
+    st.markdown(
+        f"""
+        <div class="article-card">
+            <div class="article-header">
+                <div class="article-title">{title}</div>
+                <span class="sentiment-pill" data-tone="{sentiment}">{sentiment}</span>
+            </div>
+            <div class="article-summary">{summary}</div>
+            {why_html}
+            <div class="article-meta">
+                <span>🌍 {region}</span>
+                <span>📅 {date}</span>
+            </div>
+            <div class="article-tags">{tags_html}</div>
+            <div class="article-source">Source: {source}</div>
+            {link_html}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-
-if not filtered_articles:
-    st.info("No articles match your filters.")
-else:
-    for art in filtered_articles:
-        sentiment = get_sentiment(art)
-        badge_color = sentiment_color(sentiment)
-        with st.container():
-            st.markdown(
-                f"""
-                <div style="border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="font-size:18px; font-weight:700; color:#0f172a;">{art.get('title','')}</div>
-                        <span style="background:{badge_color}22; color:{badge_color}; padding:6px 10px; border-radius:12px; font-weight:600; text-transform:capitalize; font-size:12px;">{sentiment}</span>
-                    </div>
-                    <div style="color:#475569; margin-top:6px;">{art.get('summary','')}</div>
-                    <div style="color:#334155; margin-top:10px; font-weight:600;">Why it matters</div>
-                    <div style="color:#475569;">{art.get('why_it_matters') or art.get('whyItMatters') or ''}</div>
-                    <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; color:#475569; font-size:13px;">
-                        <div>🏦 {art.get('source','')}</div>
-                        <div>🌍 {art.get('region','')}</div>
-                        <div>📅 {art.get('date','')}</div>
-                        {"".join([f"<span style='background:#e2e8f0; padding:4px 8px; border-radius:10px;'>{t}</span>" for t in art.get('tags', [])])}
-                    </div>
-                    {"<div style='margin-top:10px;'><a href='" + art.get('url','') + "' target='_blank'>Open Article ↗</a></div>" if art.get('url') else ""}
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+if not filtered:
+    st.info("No matching articles found.")
