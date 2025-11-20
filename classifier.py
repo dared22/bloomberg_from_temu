@@ -109,6 +109,10 @@ class NewsClassifier:
             if not all(k in art for k in required):
                 continue
 
+            region = art["region"]
+            if region not in final:
+                continue
+
             final[region].append({
                 "title": art["title"],
                 "summary": art["summary"],
