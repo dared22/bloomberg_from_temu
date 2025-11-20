@@ -1,7 +1,6 @@
 import json
 import asyncio
 import backoff
-import datetime
 
 class NewsClassifier:
     def __init__(self, json_schema, prompt, articles, model, client):
@@ -11,7 +10,7 @@ class NewsClassifier:
         self.model = model
         self.client = client
 
-    def build_articles_payload(self, batch):
+    def build_articles_payload(self, batch):  #batches to send to chatgpt
         return [
             {
                 "id": art["id"],
@@ -22,10 +21,10 @@ class NewsClassifier:
                 "snippet": art.get("snippet") or "",
                 "regionGuess": art.get("regionGuess") or ""
             }
-            for art in batch
+            for art in batch 
         ]
 
-    @backoff.on_exception(backoff.expo, Exception, max_tries=5)
+    @backoff.on_exception(backoff.expo, Exception, max_tries=5) #chatgpt rate limit. tries 5 times, with exponential wait time. 
     async def classify_batch_async(self, batch):
         payload = self.build_articles_payload(batch)
         response = await self.client.chat.completions.create(
@@ -40,13 +39,14 @@ class NewsClassifier:
         )
         return json.loads(response.choices[0].message.content)
 
-    def chunk(self, lst, n):
+    def chunk(self, lst, n): 
         for i in range(0, len(lst), n):
             yield lst[i:i+n]
 
     async def main(self, batch_size, max_parallel):
         for art in self.articles:
-            art.setdefault("regionGuess", None)
+            if "regionGuess" not in art:
+                art["regionGuess"] = None
 
         region_groups = {
             "North America": [],
@@ -69,12 +69,12 @@ class NewsClassifier:
                 key=lambda x: x.get("date") or "",
                 reverse=True
             )
-            selected_articles.extend(arts_sorted[:25])
+            selected_articles.extend(arts_sorted[:20]) #top 20 newest articles for each region. 
 
         for idx, art in enumerate(selected_articles):
             art["id"] = idx
 
-        sem = asyncio.Semaphore(max_parallel)
+        sem = asyncio.Semaphore(max_parallel) #amount of simoultanious calls
         tasks = []
 
         async def sem_task(batch):
@@ -84,7 +84,7 @@ class NewsClassifier:
         for batch in self.chunk(selected_articles, batch_size):
             tasks.append(asyncio.create_task(sem_task(batch)))
 
-        raw_results = await asyncio.gather(*tasks)
+        raw_results = await asyncio.gather(*tasks) # wait until finish
 
         results = []
         for r in raw_results:
@@ -106,10 +106,11 @@ class NewsClassifier:
                 "title", "summary", "date", "whyItMatters",
                 "source", "tags", "url", "nbimSentiment", "region"
             ]
-            if not all(k in art for k in required):
+            if not all(k in art for k in required): #check so that nothing breaks
                 continue
 
-            final[region].append({
+            
+            final[art["region"]].append({
                 "title": art["title"],
                 "summary": art["summary"],
                 "date": art["date"],
@@ -120,5 +121,5 @@ class NewsClassifier:
                 "url": art["url"],
                 "nbimSentiment": art["nbimSentiment"],
             })
-
+        print("classifier run done.")
         return final

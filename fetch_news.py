@@ -14,17 +14,17 @@ class NewsExtractor:
         self.session = session
 
     def clean_text(self, text: str) -> str:
-        return re.sub(r"\s+", " ", text or "").strip()
+        return re.sub(r"\s+", " ", text or "").strip()#remove whitespace, save tokens
     
     def clean_html(self, html: str) -> str:
         if not html:
             return ""
         soup = BeautifulSoup(html, "html.parser")
         text = soup.get_text(" ", strip=True)
-        return self.clean_text(text)
+        return self.clean_text(text) 
 
     def hash_url(self, url: str) -> str:
-        return hashlib.md5(url.encode()).hexdigest()
+        return hashlib.md5(url.encode()).hexdigest() #hashing url to check uniqueness
     
     def safe_get(self, url: str, *, params=None):
         try:
@@ -42,7 +42,7 @@ class NewsExtractor:
         dt = self.parse_date_safe(d)
         if not dt:
             return ""
-        return dt.strftime("%Y-%m-%d")
+        return dt.strftime("%Y-%m-%d") #convert to clean datetime
     
     def fetch_google_news(self, query: str):
         url = "https://news.google.com/rss/search"
@@ -53,7 +53,7 @@ class NewsExtractor:
             return []
 
         soup = BeautifulSoup(r.text, "xml")
-        items = soup.find_all("item")
+        items = soup.find_all("item") #all articles
 
         results = []
         for item in items:
@@ -66,7 +66,7 @@ class NewsExtractor:
             })
         return results
     
-    def fetch_all(self):
+    def fetch_all(self): #run for all keywords and regions
         collected = []
     
         for region, keywords in self.keywords.items():
@@ -99,7 +99,7 @@ class NewsExtractor:
         articles_sorted = sorted(
             enriched,
             key=lambda x: x.get("date", ""),
-            reverse=True
+            reverse=True #newest first
         )
 
         for idx, art in enumerate(articles_sorted):
