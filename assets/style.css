@@ -38,10 +38,10 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 .nbim-logo svg {
-    height: 58px;
+    height: 56px;
     width: auto;
     display: block;
-    transform: translateY(10px);
+    transform: translateY(9px);
 }
 
 .hero-text {

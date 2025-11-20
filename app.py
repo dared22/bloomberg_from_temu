@@ -1,13 +1,14 @@
 import asyncio
 import json
 import os
+import threading
 from html import escape
+
+import altair as alt
+import pandas as pd
 import streamlit as st
 import tls_client
 from openai import AsyncOpenAI
-import altair as alt
-import pandas as pd
-import threading
 
 from classifier import NewsClassifier
 from fetch_news import NewsExtractor
@@ -18,12 +19,7 @@ VALID_SENTIMENTS = {"bearish", "neutral", "bullish"}
 
 st.set_page_config(page_title="NBIM News", page_icon="./assets/favicon.ico", layout="wide")
 
-if "thread_started" not in st.session_state:
-    st.session_state.thread_started = False
-if "done" not in st.session_state:
-    st.session_state.done = False
-
-with open("assets/style.css") as f: 
+with open("assets/style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 def load_cache():
@@ -38,16 +34,13 @@ def load_cache():
         "Latin America": []
     }
 
-
 def save_cache(data):
     with open(CACHE_FILE, "w") as f:
         json.dump(data, f, indent=2)
 
-
 def normalize_sentiment(a):
     s = (a.get("nbimSentiment") or a.get("sentiment") or "neutral").lower().strip()
     return s if s in VALID_SENTIMENTS else "neutral"
-
 
 cached = load_cache()
 
@@ -55,8 +48,14 @@ session = tls_client.Session(client_identifier="chrome_120", random_tls_extensio
 extractor = NewsExtractor(snippet_len=MAX_SNIPPET_LEN, header=HEADERS, keywords=KEYWORDS, session=session)
 articles = extractor.fetch_all()
 
+if "running" not in st.session_state:
+    st.session_state["running"] = False
+if "refresh" not in st.session_state:
+    st.session_state["refresh"] = False
 
-async def run_classifier_async():
+def run_classifier():
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    loop = asyncio.get_event_loop()
     client = AsyncOpenAI()
     classifier = NewsClassifier(
         client=client,
@@ -65,28 +64,18 @@ async def run_classifier_async():
         articles=articles,
         model="gpt-5-mini"
     )
-    result = await classifier.main(batch_size=25, max_parallel=6)
+    result = loop.run_until_complete(classifier.main(batch_size=25, max_parallel=6))
     save_cache(result)
+    st.session_state["running"] = False
+    st.session_state["refresh"] = True
 
+if not st.session_state["running"]:
+    st.session_state["running"] = True
+    threading.Thread(target=run_classifier, daemon=True).start()
 
-def background_runner():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(run_classifier_async())
-    loop.close()
-    st.session_state.done = True
-    st.rerun()
-
-
-if not st.session_state.done:
-    if not st.session_state.thread_started:
-        st.session_state.thread_started = True
-        threading.Thread(target=background_runner, daemon=True).start()
-    st.info("↻ Updating news in the background…")
-
-else:
-    cached = load_cache()
-
+if st.session_state["refresh"]:
+    st.session_state["refresh"] = False
+    st.experimental_rerun()
 
 with open("assets/logo.svg") as f:
     logo_svg = f.read()
@@ -103,7 +92,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
 
 rows = []
 for region, items in cached.items():
@@ -148,9 +136,21 @@ st.altair_chart(chart, width="stretch")
 
 
 col_search, col_region, col_sent = st.columns((5, 1.5, 1.5))
-search = col_search.text_input("Search:", placeholder="Search by institution or title...")
-region_filter = col_region.selectbox("Region:", ["All Regions"] + list(cached.keys()))
-sent_filter = col_sent.selectbox("Sentiment:", ["All Sentiment", "bearish", "neutral", "bullish"])
+search = col_search.text_input(
+    "Search articles",
+    placeholder="Search by institution or title...",
+    label_visibility="collapsed",
+)
+region_filter = col_region.selectbox(
+    "Filter by region",
+    ["All Regions"] + list(cached.keys()),
+    label_visibility="collapsed",
+)
+sent_filter = col_sent.selectbox(
+    "Filter by sentiment",
+    ["All Sentiment", "bearish", "neutral", "bullish"],
+    label_visibility="collapsed",
+)
 
 articles_all = []
 for region, items in cached.items():
@@ -170,7 +170,6 @@ for a in articles_all:
         a.get("source", ""),
         " ".join(a.get("tags") or []),
     ]).lower()
-
     if q and q not in text:
         continue
     if region_filter != "All Regions" and a["region"] != region_filter:
