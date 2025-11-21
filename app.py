@@ -1,7 +1,6 @@
 import asyncio
 import json
 import os
-import threading
 from html import escape
 
 import altair as alt
@@ -43,39 +42,6 @@ def normalize_sentiment(a):
     return s if s in VALID_SENTIMENTS else "neutral"
 
 cached = load_cache()
-
-session = tls_client.Session(client_identifier="chrome_120", random_tls_extension_order=True)
-extractor = NewsExtractor(snippet_len=MAX_SNIPPET_LEN, header=HEADERS, keywords=KEYWORDS, session=session)
-articles = extractor.fetch_all()
-
-if "running" not in st.session_state:
-    st.session_state["running"] = False
-if "refresh" not in st.session_state:
-    st.session_state["refresh"] = False
-
-def run_classifier():
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    loop = asyncio.get_event_loop()
-    client = AsyncOpenAI()
-    classifier = NewsClassifier(
-        client=client,
-        json_schema=JSON_SCHEMA,
-        prompt=SYSTEM_PROMPT,
-        articles=articles,
-        model="gpt-5-mini"
-    )
-    result = loop.run_until_complete(classifier.main(batch_size=25, max_parallel=6))
-    save_cache(result)
-    st.session_state["running"] = False
-    st.session_state["refresh"] = True
-
-if not st.session_state["running"]:
-    st.session_state["running"] = True
-    threading.Thread(target=run_classifier, daemon=True).start()
-
-if st.session_state["refresh"]:
-    st.session_state["refresh"] = False
-    st.experimental_rerun()
 
 with open("assets/logo.svg") as f:
     logo_svg = f.read()
@@ -135,7 +101,7 @@ chart = (
 st.altair_chart(chart, width="stretch")
 
 
-col_search, col_region, col_sent = st.columns((5, 1.5, 1.5))
+col_search, col_region, col_sent, col_btn = st.columns((5, 1.5, 1.5, 1.2))
 search = col_search.text_input(
     "Search articles",
     placeholder="Search by institution or title...",
@@ -151,6 +117,27 @@ sent_filter = col_sent.selectbox(
     ["All Sentiment", "bearish", "neutral", "bullish"],
     label_visibility="collapsed",
 )
+
+refresh_clicked = col_btn.button("Refresh data", use_container_width=True)
+if refresh_clicked:
+    with st.spinner("Running classifier…"):
+        session = tls_client.Session(client_identifier="chrome_120", random_tls_extension_order=True)
+        extractor = NewsExtractor(snippet_len=MAX_SNIPPET_LEN, header=HEADERS, keywords=KEYWORDS, session=session)
+        articles = extractor.fetch_all()
+
+        client = AsyncOpenAI()
+        classifier = NewsClassifier(
+            client=client,
+            json_schema=JSON_SCHEMA,
+            prompt=SYSTEM_PROMPT,
+            articles=articles,
+            model="gpt-5-mini"
+        )
+        result = asyncio.run(classifier.main(batch_size=25, max_parallel=6))
+        save_cache(result)
+        cached = result
+    st.success("Data reloaded.")
+    st.rerun()
 
 articles_all = []
 for region, items in cached.items():

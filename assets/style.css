@@ -80,6 +80,39 @@ html, body, [data-testid="stAppViewContainer"] {
     margin: 0px 0 12px;
 }
 
+<<<<<<< ours
+.controls-row {
+    display: grid;
+    grid-template-columns: 5fr 1.5fr 1.5fr 2.8fr;
+    gap: 10px;
+    align-items: center;
+    margin: 12px 0 8px;
+}
+
+.controls-row .stButton > button,
+.controls-row input,
+.controls-row select {
+    width: 100%;
+}
+
+.controls-row .stButton > button {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: none;
+    min-height: 40px;
+}
+
+.controls-row .stButton > button:hover {
+    background: #f4f4f4;
+}
+
+=======
+>>>>>>> theirs
 .article-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -186,3 +219,20 @@ html, body, [data-testid="stAppViewContainer"] {
 
 .article-link::after { content: "↗"; }
 .article-link:hover { text-decoration: underline; }
+
+/* Controls row button to match inputs */
+.stButton > button {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.stButton > button:hover {
+    background: #f4f4f4;
+}
