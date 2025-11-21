@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBIM News</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="/assets/style.css">
+    <style>
+        body {
+            margin: 0;
+            background: var(--page-bg);
+            color: var(--text-primary);
+            font-family: "Inter", sans-serif;
+        }
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 32px 48px;
+        }
+        .status-banner {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #f0f4ff;
+            color: #1e3a8a;
+            border: 1px solid #dbeafe;
+            font-weight: 600;
+        }
+        /* page-level spacing helpers */
+        .article-list { margin-top: 8px; }
+        .nbim-logo-img { height: 48px; width: auto; transform: translateY(0px); }
+        .muted { color: var(--muted); font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="page-header">
+            <div class="nbim-logo">
+                <img src="/assets/logo.svg" alt="NBIM logo" class="nbim-logo-img" />
+            </div>
+            <div class="hero-text">
+                <h1>GPT News</h1>
+                <p>Regulatory news relevant to NBIM's five biggest markets classified by ChatGPT</p>
+            </div>
+        </div>
+
+        <div id="status-banner" class="status-banner" style="display:none;"></div>
+
+        <div class="card chart-card">
+            <div class="section-title">Sentiment Analysis by Region</div>
+            <canvas id="sentimentChart" height="200"></canvas>
+        </div>
+
+        <div class="card controls-card">
+            <input id="search" class="search-input" type="text" placeholder="Search by institution or title..." />
+            <select id="region-filter" class="select-input"></select>
+            <select id="sentiment-filter" class="select-input">
+                <option value="all">All Sentiment</option>
+                <option value="bearish">bearish</option>
+                <option value="neutral">neutral</option>
+                <option value="bullish">bullish</option>
+            </select>
+            <button id="refresh-btn" class="btn">Update</button>
+        </div>
+
+        <div id="article-title" class="article-section-title">Latest Updates <span id="article-count"></span></div>
+        <div id="articles" class="article-list"></div>
+        <div id="empty-state" class="muted" style="display:none;">No matching articles found.</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script type="module" src="/static/main.js"></script>
+</body>
+</html>

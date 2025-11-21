@@ -1,9 +1,9 @@
 :root {
-    --page-bg: #f4eee6;
+    --page-bg: #f6f2ec;
     --card-bg: #ffffff;
     --text-primary: #0b1c38;
     --text-secondary: #4b5563;
-    --border: #e4ded5;
+    --border: #e5e1da;
     --muted: #9ca3af;
     --bearish: #e74c3c;
     --neutral: #9fa6b2;
@@ -23,61 +23,139 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 .page-header {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr;
     align-items: center;
-    gap: 18px;
-    margin-bottom: 24px;   
+    gap: 12px;
+    margin-bottom: 16px;
 }
-
 
 .nbim-logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 12px;
 }
 
 .nbim-logo svg {
-    height: 56px;
+    height: 48px;
     width: auto;
     display: block;
-    transform: translateY(9px);
+    transform: translateY(0px);
 }
 
 .hero-text {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    gap: 1px;
+    padding-left: 4px;
 }
-
 
 .page-header h1 {
     margin: 0;
-    font-size: 26px;     
-    font-weight: 700;   
+    font-size: 26px;
+    font-weight: 800;
     letter-spacing: -0.3px;
 }
 
-
 .page-header p {
-    margin: 2px 0 0 0;
+    margin: 0;
     color: var(--text-secondary);
     font-size: 15px;
 }
 
-
 .section-title {
-    font-size: 20px;       
-    font-weight: 600;      
+    font-size: 19px;
+    font-weight: 700;
     color: #0b1c38;
-    margin: 10px 0 14px 0; 
+    margin: 6px 0 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
+.section-title::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 18px;
+    border-radius: 999px;
+    background: #2563eb;
+}
 
 .article-section-title {
     font-size: 18px;
     font-weight: 700;
-    margin: 0px 0 12px;
+    margin: 0 0 12px;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: 0 6px 12px rgba(15, 23, 42, 0.05);
+}
+
+.chart-card {
+    margin-top: 10px;
+    margin-bottom: 18px;
+}
+
+.controls-card {
+    margin-bottom: 12px;
+    display: grid;
+    grid-template-columns: 1fr 200px 200px 120px;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 8px;
+}
+
+.search-input, .select-input {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 14px;
+    min-height: 40px;
+    box-sizing: border-box;
+}
+
+.search-input { width: 100%; }
+.select-input { width: 100%; }
+
+@media (max-width: 960px) {
+    .controls-card {
+        grid-template-columns: 1fr;
+    }
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #eef2ff;
+    color: #1d4ed8;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn:hover { background: #e0e7ff; }
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.chart-card canvas {
+    display: block;
+    width: 100% !important;
+    max-height: 280px;
 }
 
 .article-card {
@@ -109,17 +187,17 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 .sentiment-pill[data-tone="bearish"] {
-    background: rgba(231, 76, 60, 0.15);
+    background: rgba(231, 76, 60, 0.12);
     color: var(--bearish);
     border: 1px solid rgba(231, 76, 60, 0.3);
 }
 .sentiment-pill[data-tone="neutral"] {
-    background: rgba(159, 166, 178, 0.15);
+    background: rgba(159, 166, 178, 0.12);
     color: var(--neutral);
     border: 1px solid rgba(159, 166, 178, 0.3);
 }
 .sentiment-pill[data-tone="bullish"] {
-    background: rgba(37, 99, 235, 0.15);
+    background: rgba(37, 99, 235, 0.12);
     color: var(--bullish);
     border: 1px solid rgba(37, 99, 235, 0.3);
 }
