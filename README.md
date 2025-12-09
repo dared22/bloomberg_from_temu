@@ -25,13 +25,8 @@ pip install -r requirements.txt
 export OPENAI_KEY=your_key_here
 streamlit run app.py
 ```
-Or check out the online version at:
-https://nbim-dashboard-6d3a6c69b30e.herokuapp.com/
 
 ## Stuff That Needs Fixing
 - The openai pipline is very slow. Even after paralellising it takes forever to run. 
 - ChatGPT also hallusinates too much to be used in production
 - The outputs arn't determenistic, especially the sentiment ones. 
-- Streamlit won't update results in real time. 
-- But all of the above can be solved in the future, if I have time and motivation. 
-- So stay tuned for Bloomerg from Temu v.2 (hooray!)
